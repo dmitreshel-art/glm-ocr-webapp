@@ -1,0 +1,38 @@
+# Alternative Dockerfile - builds llama.cpp from source
+# Use this if the official image doesn't work
+
+FROM python:3.11-slim
+
+# Install build dependencies
+RUN apt-get update && apt-get install -y \
+    curl \
+    wget \
+    git \
+    build-essential \
+    cmake \
+    && rm -rf /var/lib/apt/lists/*
+
+# Build llama.cpp
+WORKDIR /app
+RUN git clone https://github.com/ggml-org/llama.cpp.git \
+    && cd llama.cpp \
+    && cmake -B build -DGGML_CUDA=OFF \
+    && cmake --build build --config Release -j$(nproc) \
+    && cp build/bin/llama-server /usr/local/bin/ \
+    && cd .. && rm -rf llama.cpp
+
+# Python backend
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY backend/ ./backend/
+COPY static/ ./static/
+
+ENV HF_REPO=ggml-org/GLM-OCR-GGUF:Q8_0
+
+EXPOSE 8080
+
+HEALTHCHECK --interval=30s --timeout=10s --start-period=120s \
+    CMD curl -f http://localhost:8080/health || exit 1
+
+CMD ["python", "-m", "backend.server"]

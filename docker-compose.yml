@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  glm-ocr:
+    build: .
+    image: glm-ocr-webapp:latest
+    container_name: glm-ocr-web
+    ports:
+      - "8080:8080"
+    environment:
+      - HF_REPO=ggml-org/GLM-OCR-GGUF:Q8_0
+      - LLAMA_SERVER_PORT=8765
+      - TZ=UTC
+    volumes:
+      - hf-cache:/root/.cache/llama.cpp
+    restart: unless-stopped
+    deploy:
+      resources:
+        reservations:
+          memory: 2G
+        limits:
+          memory: 4G
+
+volumes:
+  hf-cache:
+    driver: local

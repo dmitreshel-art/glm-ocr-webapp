@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GLM-OCR — Распознавание текста</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --bg-primary: #0f0f23;
+            --bg-secondary: #1a1a2e;
+            --bg-tertiary: #16213e;
+            --accent: #00d4ff;
+            --accent-dim: #0099cc;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0b0;
+            --success: #00ff88;
+            --error: #ff4757;
+            --border: #2a2a4a;
+        }
+        
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2rem;
+            background-image: 
+                radial-gradient(ellipse at top, rgba(0, 212, 255, 0.1) 0%, transparent 50%),
+                radial-gradient(ellipse at bottom, rgba(0, 255, 136, 0.05) 0%, transparent 50%);
+        }
+        
+        .container {
+            max-width: 900px;
+            width: 100%;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--accent), var(--success));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+        }
+        
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+        }
+        
+        .card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
+        }
+        
+        .upload-zone {
+            border: 2px dashed var(--border);
+            border-radius: 12px;
+            padding: 3rem 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .upload-zone:hover, .upload-zone.dragover {
+            border-color: var(--accent);
+            background: rgba(0, 212, 255, 0.05);
+        }
+        
+        .upload-zone.has-image {
+            padding: 1rem;
+        }
+        
+        .upload-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            filter: grayscale(50%);
+        }
+        
+        .upload-zone:hover .upload-icon {
+            filter: grayscale(0%);
+        }
+        
+        .upload-text {
+            color: var(--text-secondary);
+            font-size: 1rem;
+        }
+        
+        .upload-hint {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            margin-top: 0.5rem;
+            opacity: 0.7;
+        }
+        
+        #file-input {
+            display: none;
+        }
+        
+        #preview-container {
+            margin-top: 1rem;
+            display: none;
+        }
+        
+        #preview-container.show {
+            display: block;
+        }
+        
+        #preview-image {
+            max-width: 100%;
+            max-height: 400px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, var(--accent), var(--accent-dim));
+            color: var(--text-primary);
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            margin-top: 1.5rem;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0, 212, 255, 0.3);
+        }
+        
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .btn:disabled:hover {
+            box-shadow: none;
+        }
+        
+        .progress {
+            display: none;
+            margin-top: 1.5rem;
+        }
+        
+        .progress.show {
+            display: block;
+        }
+        
+        .progress-bar {
+            height: 4px;
+            background: var(--bg-tertiary);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent), var(--success));
+            width: 0%;
+            animation: progress 2s ease-in-out infinite;
+        }
+        
+        @keyframes progress {
+            0% { width: 0%; }
+            50% { width: 70%; }
+            100% { width: 100%; }
+        }
+        
+        .progress-text {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-top: 0.75rem;
+            text-align: center;
+        }
+        
+        .result-card {
+            display: none;
+        }
+        
+        .result-card.show {
+            display: block;
+        }
+        
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .result-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        
+        .copy-btn {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.2s ease;
+        }
+        
+        .copy-btn:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+        
+        .result-text {
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+            padding: 1.5rem;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            max-height: 400px;
+            overflow-y: auto;
+            color: var(--text-primary);
+        }
+        
+        .result-text::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        .result-text::-webkit-scrollbar-track {
+            background: var(--bg-secondary);
+        }
+        
+        .result-text::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 4px;
+        }
+        
+        .error-box {
+            background: rgba(255, 71, 87, 0.1);
+            border: 1px solid var(--error);
+            border-radius: 8px;
+            padding: 1rem;
+            color: var(--error);
+            display: none;
+        }
+        
+        .error-box.show {
+            display: block;
+        }
+        
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-top: 1rem;
+        }
+        
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--text-secondary);
+        }
+        
+        .status-dot.ready {
+            background: var(--success);
+            box-shadow: 0 0 8px var(--success);
+        }
+        
+        .status-dot.error {
+            background: var(--error);
+            box-shadow: 0 0 8px var(--error);
+        }
+        
+        footer {
+            margin-top: 2rem;
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+        }
+        
+        footer a {
+            color: var(--accent);
+            text-decoration: none;
+        }
+        
+        @media (max-width: 600px) {
+            body {
+                padding: 1rem;
+            }
+            
+            h1 {
+                font-size: 1.8rem;
+            }
+            
+            .card {
+                padding: 1.5rem;
+            }
+            
+            .upload-zone {
+                padding: 2rem 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🧠 GLM-OCR</h1>
+            <p class="subtitle">Распознавание текста с изображений</p>
+        </header>
+        
+        <div class="card">
+            <div class="status-indicator">
+                <span class="status-dot" id="status-dot"></span>
+                <span id="status-text">Проверка сервера...</span>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="upload-zone" id="upload-zone">
+                <div class="upload-icon">📄</div>
+                <div class="upload-text">Перетащите изображение или нажмите для выбора</div>
+                <div class="upload-hint">PNG, JPG, WebP, GIF • до 20MB</div>
+                <input type="file" id="file-input" accept="image/*">
+            </div>
+            
+            <div id="preview-container">
+                <img id="preview-image" alt="Предпросмотр">
+            </div>
+            
+            <button class="btn" id="process-btn" disabled>
+                🔍 Распознать текст
+            </button>
+            
+            <div class="progress" id="progress">
+                <div class="progress-bar">
+                    <div class="progress-fill"></div>
+                </div>
+                <div class="progress-text">Обработка...</div>
+            </div>
+            
+            <div class="error-box" id="error-box"></div>
+        </div>
+        
+        <div class="card result-card" id="result-card">
+            <div class="result-header">
+                <span class="result-title">📝 Распознанный текст</span>
+                <button class="copy-btn" id="copy-btn">📋 Копировать</button>
+            </div>
+            <div class="result-text" id="result-text"></div>
+        </div>
+        
+        <footer>
+            Powered by <a href="https://github.com/ggml-org/llama.cpp" target="_blank">llama.cpp</a> + <a href="https://huggingface.co/ggml-org/GLM-OCR-GGUF" target="_blank">GLM-OCR</a>
+        </footer>
+    </div>
+    
+    <script>
+        const uploadZone = document.getElementById('upload-zone');
+        const fileInput = document.getElementById('file-input');
+        const previewContainer = document.getElementById('preview-container');
+        const previewImage = document.getElementById('preview-image');
+        const processBtn = document.getElementById('process-btn');
+        const progress = document.getElementById('progress');
+        const resultCard = document.getElementById('result-card');
+        const resultText = document.getElementById('result-text');
+        const errorBox = document.getElementById('error-box');
+        const copyBtn = document.getElementById('copy-btn');
+        const statusDot = document.getElementById('status-dot');
+        const statusText = document.getElementById('status-text');
+        
+        let selectedFile = null;
+        
+        // Health check
+        async function checkHealth() {
+            try {
+                const res = await fetch('/health');
+                const data = await res.json();
+                if (data.server_ready) {
+                    statusDot.classList.add('ready');
+                    statusDot.classList.remove('error');
+                    statusText.textContent = `Сервер готов (${data.model})`;
+                } else {
+                    statusDot.classList.remove('ready');
+                    statusText.textContent = 'Сервер запускается...';
+                    setTimeout(checkHealth, 2000);
+                }
+            } catch (e) {
+                statusDot.classList.add('error');
+                statusText.textContent = 'Ошибка подключения к серверу';
+            }
+        }
+        
+        checkHealth();
+        
+        // Drag & drop
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(event => {
+            uploadZone.addEventListener(event, e => {
+                e.preventDefault();
+                e.stopPropagation();
+            });
+        });
+        
+        ['dragenter', 'dragover'].forEach(event => {
+            uploadZone.addEventListener(event, () => {
+                uploadZone.classList.add('dragover');
+            });
+        });
+        
+        ['dragleave', 'drop'].forEach(event => {
+            uploadZone.addEventListener(event, () => {
+                uploadZone.classList.remove('dragover');
+            });
+        });
+        
+        uploadZone.addEventListener('drop', e => {
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                handleFile(files[0]);
+            }
+        });
+        
+        uploadZone.addEventListener('click', () => {
+            fileInput.click();
+        });
+        
+        fileInput.addEventListener('change', e => {
+            if (e.target.files.length > 0) {
+                handleFile(e.target.files[0]);
+            }
+        });
+        
+        function handleFile(file) {
+            if (!file.type.startsWith('image/')) {
+                showError('Выберите файл изображения');
+                return;
+            }
+            
+            if (file.size > 20 * 1024 * 1024) {
+                showError('Файл слишком большой (макс. 20MB)');
+                return;
+            }
+            
+            selectedFile = file;
+            
+            const reader = new FileReader();
+            reader.onload = e => {
+                previewImage.src = e.target.result;
+                previewContainer.classList.add('show');
+                uploadZone.classList.add('has-image');
+                processBtn.disabled = false;
+                hideError();
+                resultCard.classList.remove('show');
+            };
+            reader.readAsDataURL(file);
+        }
+        
+        processBtn.addEventListener('click', async () => {
+            if (!selectedFile) return;
+            
+            const formData = new FormData();
+            formData.append('file', selectedFile);
+            
+            processBtn.disabled = true;
+            progress.classList.add('show');
+            hideError();
+            
+            try {
+                const res = await fetch('/api/ocr', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await res.json();
+                
+                if (data.success) {
+                    resultText.textContent = data.text;
+                    resultCard.classList.add('show');
+                } else {
+                    showError(data.error || 'Ошибка распознавания');
+                }
+            } catch (e) {
+                showError('Ошибка соединения: ' + e.message);
+            } finally {
+                progress.classList.remove('show');
+                processBtn.disabled = false;
+            }
+        });
+        
+        copyBtn.addEventListener('click', () => {
+            navigator.clipboard.writeText(resultText.textContent).then(() => {
+                copyBtn.textContent = '✓ Скопировано';
+                setTimeout(() => {
+                    copyBtn.textContent = '📋 Копировать';
+                }, 2000);
+            });
+        });
+        
+        function showError(msg) {
+            errorBox.textContent = msg;
+            errorBox.classList.add('show');
+        }
+        
+        function hideError() {
+            errorBox.classList.remove('show');
+        }
+    </script>
+</body>
+</html>
