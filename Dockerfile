@@ -1,18 +1,10 @@
-# Build llama.cpp from source (reliable, works everywhere)
-# Alternative: Dockerfile.build for faster build using pre-built binary
-
+# Build llama.cpp from source
 FROM python:3.11-slim AS builder
 
-# Install build dependencies
 RUN apt-get update && apt-get install -y \
-    curl \
-    wget \
-    git \
-    build-essential \
-    cmake \
+    curl wget git build-essential cmake \
     && rm -rf /var/lib/apt/lists/*
 
-# Build llama.cpp from source
 WORKDIR /build
 RUN git clone --depth 1 https://github.com/ggml-org/llama.cpp.git \
     && cd llama.cpp \
@@ -20,13 +12,19 @@ RUN git clone --depth 1 https://github.com/ggml-org/llama.cpp.git \
     && cmake --build build --config Release -j$(nproc) \
     && cp build/bin/llama-server /usr/local/bin/
 
-# Runtime image
+# Download model
+RUN mkdir -p /models \
+    && wget -q -O /models/glm-ocr-q8_0.gguf \
+    "https://huggingface.co/ggml-org/GLM-OCR-GGUF/resolve/main/GLM-OCR-Q8_0.gguf" \
+    && wget -q -O /models/mmproj.gguf \
+    "https://huggingface.co/ggml-org/GLM-OCR-GGUF/resolve/main/mmproj-GLM-OCR-Q8_0.gguf"
+
+# Runtime
 FROM python:3.11-slim
 
-# Copy llama-server from builder
-COPY --from=builder /usr/local/bin/llama-server /usr/local/bin/llama-server
+COPY --from=builder /usr/local/bin/llama-server /usr/local/bin/
+COPY --from=builder /models /models
 
-# Python backend
 WORKDIR /app
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
@@ -34,7 +32,9 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY backend/ ./backend/
 COPY static/ ./static/
 
-ENV HF_REPO=ggml-org/GLM-OCR-GGUF:Q8_0
+ENV MODEL_PATH=/models/glm-ocr-q8_0.gguf
+ENV MMPROJ_PATH=/models/mmproj.gguf
+ENV LLAMA_SERVER_PORT=8765
 
 EXPOSE 8080
 

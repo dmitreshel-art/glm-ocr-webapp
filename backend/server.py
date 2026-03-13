@@ -23,8 +23,8 @@ from fastapi.staticfiles import StaticFiles
 app = FastAPI(title="GLM-OCR Web", version="1.0.0")
 
 # Configuration
-# Model will be downloaded from HuggingFace: ggml-org/GLM-OCR-GGUF
-HF_REPO = os.getenv("HF_REPO", "ggml-org/GLM-OCR-GGUF:Q8_0")
+MODEL_PATH = Path(os.getenv("MODEL_PATH", "/models/glm-ocr-q8_0.gguf"))
+MMPROJ_PATH = Path(os.getenv("MMPROJ_PATH", "/models/mmproj.gguf"))
 LLAMA_SERVER_PORT = int(os.getenv("LLAMA_SERVER_PORT", "8765"))
 UPLOAD_DIR = Path(os.getenv("UPLOAD_DIR", "/tmp/ocr-uploads"))
 RESULT_DIR = Path(os.getenv("RESULT_DIR", "/tmp/ocr-results"))
@@ -39,19 +39,24 @@ server_ready = False
 
 
 async def start_llama_server():
-    """Start llama.cpp server in background with auto-download from HuggingFace."""
+    """Start llama.cpp server in background with local model."""
     global llama_process, server_ready
     
     if llama_process is not None:
         return
     
-    print(f"Starting llama-server with HuggingFace model: {HF_REPO}")
+    print(f"Starting llama-server with model: {MODEL_PATH}")
     
-    # Use -hf to auto-download model + mmproj from HuggingFace
-    # The --mmproj-auto flag will automatically load mmproj if available
+    if not MODEL_PATH.exists():
+        raise RuntimeError(f"Model not found: {MODEL_PATH}")
+    
+    if not MMPROJ_PATH.exists():
+        raise RuntimeError(f"mmproj not found: {MMPROJ_PATH}")
+    
     llama_process = await asyncio.create_subprocess_exec(
         "llama-server",
-        "-hf", HF_REPO,  # Auto-download from HuggingFace
+        "-m", str(MODEL_PATH),
+        "--mmproj", str(MMPROJ_PATH),
         "--port", str(LLAMA_SERVER_PORT),
         "--host", "127.0.0.1",
         "--ctx-size", "4096",
@@ -115,7 +120,7 @@ async def health():
     return {
         "status": "healthy",
         "server_ready": server_ready,
-        "model": HF_REPO
+        "model": str(MODEL_PATH.name)
     }
 
 
