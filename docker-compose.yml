@@ -1,23 +1,9 @@
 version: '3.8'
 
 services:
-  # Python web backend - connects to HIP llama-server on Windows host
-  webapp:
-    build: 
-      context: .
-      dockerfile: Dockerfile.web
-    container_name: glm-ocr-web
-    ports:
-      - "8080:8080"
-    volumes:
-      - ./results:/app/results
-    environment:
-      - LLAMA_SERVER_URL=http://host.docker.internal:8765
-      - RESULTS_DIR=/app/results
-    restart: unless-stopped
-
-  # llama.cpp server (CPU-only, disabled when using HIP on host)
-  # Uncomment to use CPU-only:
+  # llama.cpp server (CPU-only, optional)
+  # Use this OR run HIP llama-server.exe on Windows (not both)
+  # To enable: uncomment the service below and comment out HIP in start script
   # llama-server:
   #   image: ghcr.io/ggml-org/llama.cpp:server
   #   container_name: glm-ocr-llama
@@ -37,3 +23,24 @@ services:
   #     resources:
   #       limits:
   #         memory: 4G
+
+  # Python web backend
+  # Connects to llama-server on port 8765
+  # Priority: 1) LLAMA_SERVER_URL env var, 2) host.docker.internal (HIP on Windows), 3) llama-server container
+  webapp:
+    build: 
+      context: .
+      dockerfile: Dockerfile.web
+    container_name: glm-ocr-web
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./results:/app/results
+    environment:
+      # For HIP on Windows: http://host.docker.internal:8765
+      # For Docker llama-server: http://llama-server:8080
+      - LLAMA_SERVER_URL=${LLAMA_SERVER_URL:-http://host.docker.internal:8765}
+      - RESULTS_DIR=/app/results
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    restart: unless-stopped
