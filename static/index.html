@@ -17,10 +17,10 @@
             --bg-tertiary: #16213e;
             --accent: #00d4ff;
             --accent-dim: #0099cc;
-            --text-primary: #ffffff;
-            --text-secondary: #a0a0b0;
             --success: #00ff88;
             --error: #ff4757;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0b0;
             --border: #2a2a4a;
         }
         
@@ -31,249 +31,33 @@
             min-height: 100vh;
             display: flex;
             flex-direction: column;
-            align-items: center;
-            padding: 2rem;
-            background-image: 
-                radial-gradient(ellipse at top, rgba(0, 212, 255, 0.1) 0%, transparent 50%),
-                radial-gradient(ellipse at bottom, rgba(0, 255, 136, 0.05) 0%, transparent 50%);
         }
         
         .container {
-            max-width: 900px;
+            max-width: 1400px;
             width: 100%;
+            margin: 0 auto;
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
         }
         
         header {
-            text-align: center;
-            margin-bottom: 3rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 0;
+            margin-bottom: 1rem;
         }
         
         h1 {
-            font-size: 2.5rem;
+            font-size: 1.5rem;
             font-weight: 700;
             background: linear-gradient(135deg, var(--accent), var(--success));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-            margin-bottom: 0.5rem;
-        }
-        
-        .subtitle {
-            color: var(--text-secondary);
-            font-size: 1.1rem;
-        }
-        
-        .card {
-            background: var(--bg-secondary);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            padding: 2rem;
-            margin-bottom: 1.5rem;
-            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
-        }
-        
-        .upload-zone {
-            border: 2px dashed var(--border);
-            border-radius: 12px;
-            padding: 3rem 2rem;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .upload-zone:hover, .upload-zone.dragover {
-            border-color: var(--accent);
-            background: rgba(0, 212, 255, 0.05);
-        }
-        
-        .upload-zone.has-image {
-            padding: 1rem;
-        }
-        
-        .upload-icon {
-            font-size: 3rem;
-            margin-bottom: 1rem;
-            filter: grayscale(50%);
-        }
-        
-        .upload-zone:hover .upload-icon {
-            filter: grayscale(0%);
-        }
-        
-        .upload-text {
-            color: var(--text-secondary);
-            font-size: 1rem;
-        }
-        
-        .upload-hint {
-            color: var(--text-secondary);
-            font-size: 0.85rem;
-            margin-top: 0.5rem;
-            opacity: 0.7;
-        }
-        
-        #file-input {
-            display: none;
-        }
-        
-        #preview-container {
-            margin-top: 1rem;
-            display: none;
-        }
-        
-        #preview-container.show {
-            display: block;
-        }
-        
-        #preview-image {
-            max-width: 100%;
-            max-height: 400px;
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-        }
-        
-        .btn {
-            background: linear-gradient(135deg, var(--accent), var(--accent-dim));
-            color: var(--text-primary);
-            border: none;
-            padding: 1rem 2rem;
-            border-radius: 8px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            width: 100%;
-            margin-top: 1.5rem;
-        }
-        
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 24px rgba(0, 212, 255, 0.3);
-        }
-        
-        .btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: none;
-        }
-        
-        .btn:disabled:hover {
-            box-shadow: none;
-        }
-        
-        .progress {
-            display: none;
-            margin-top: 1.5rem;
-        }
-        
-        .progress.show {
-            display: block;
-        }
-        
-        .progress-bar {
-            height: 4px;
-            background: var(--bg-tertiary);
-            border-radius: 2px;
-            overflow: hidden;
-        }
-        
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, var(--accent), var(--success));
-            width: 0%;
-            animation: progress 2s ease-in-out infinite;
-        }
-        
-        @keyframes progress {
-            0% { width: 0%; }
-            50% { width: 70%; }
-            100% { width: 100%; }
-        }
-        
-        .progress-text {
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-            margin-top: 0.75rem;
-            text-align: center;
-        }
-        
-        .result-card {
-            display: none;
-        }
-        
-        .result-card.show {
-            display: block;
-        }
-        
-        .result-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1rem;
-        }
-        
-        .result-title {
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: var(--text-primary);
-        }
-        
-        .copy-btn {
-            background: transparent;
-            border: 1px solid var(--border);
-            color: var(--text-secondary);
-            padding: 0.5rem 1rem;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 0.85rem;
-            transition: all 0.2s ease;
-        }
-        
-        .copy-btn:hover {
-            border-color: var(--accent);
-            color: var(--accent);
-        }
-        
-        .result-text {
-            background: var(--bg-tertiary);
-            border-radius: 8px;
-            padding: 1.5rem;
-            font-family: 'Consolas', 'Monaco', monospace;
-            font-size: 0.95rem;
-            line-height: 1.6;
-            white-space: pre-wrap;
-            word-wrap: break-word;
-            max-height: 400px;
-            overflow-y: auto;
-            color: var(--text-primary);
-        }
-        
-        .result-text::-webkit-scrollbar {
-            width: 8px;
-        }
-        
-        .result-text::-webkit-scrollbar-track {
-            background: var(--bg-secondary);
-        }
-        
-        .result-text::-webkit-scrollbar-thumb {
-            background: var(--border);
-            border-radius: 4px;
-        }
-        
-        .error-box {
-            background: rgba(255, 71, 87, 0.1);
-            border: 1px solid var(--error);
-            border-radius: 8px;
-            padding: 1rem;
-            color: var(--error);
-            display: none;
-        }
-        
-        .error-box.show {
-            display: block;
         }
         
         .status-indicator {
@@ -282,7 +66,6 @@
             gap: 0.5rem;
             font-size: 0.85rem;
             color: var(--text-secondary);
-            margin-top: 1rem;
         }
         
         .status-dot {
@@ -302,11 +85,223 @@
             box-shadow: 0 0 8px var(--error);
         }
         
-        footer {
-            margin-top: 2rem;
-            text-align: center;
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            flex: 1;
+            min-height: 0;
+        }
+        
+        .panel {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        
+        .panel-header {
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid var(--border);
+            font-weight: 600;
             color: var(--text-secondary);
-            font-size: 0.85rem;
+            font-size: 0.9rem;
+        }
+        
+        .panel-content {
+            flex: 1;
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+        }
+        
+        /* Upload Panel */
+        .upload-zone {
+            border: 2px dashed var(--border);
+            border-radius: 8px;
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 200px;
+        }
+        
+        .upload-zone:hover, .upload-zone.dragover {
+            border-color: var(--accent);
+            background: rgba(0, 212, 255, 0.05);
+        }
+        
+        .upload-zone.has-image {
+            display: none;
+        }
+        
+        .upload-icon {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .upload-text {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+        
+        .upload-hint {
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            margin-top: 0.5rem;
+            opacity: 0.7;
+        }
+        
+        #file-input {
+            display: none;
+        }
+        
+        #preview-container {
+            display: none;
+            flex: 1;
+            min-height: 0;
+        }
+        
+        #preview-container.show {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        #preview-image {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            border-radius: 8px;
+            flex: 1;
+        }
+        
+        .btn-row {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.75rem;
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, var(--accent), var(--accent-dim));
+            color: var(--text-primary);
+            border: none;
+            padding: 0.6rem 1.5rem;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            flex: 1;
+        }
+        
+        .btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 212, 255, 0.3);
+        }
+        
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .btn-secondary {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+        }
+        
+        .btn-secondary:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+            background: none;
+        }
+        
+        /* Result Panel */
+        #result-text {
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+            padding: 1rem;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            flex: 1;
+            overflow-y: auto;
+            color: var(--text-primary);
+        }
+        
+        #result-text::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        #result-text::-webkit-scrollbar-track {
+            background: var(--bg-secondary);
+        }
+        
+        #result-text::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 3px;
+        }
+        
+        .progress {
+            display: none;
+            margin-top: 0.75rem;
+        }
+        
+        .progress.show {
+            display: block;
+        }
+        
+        .progress-bar {
+            height: 3px;
+            background: var(--bg-tertiary);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent), var(--success));
+            width: 0%;
+            animation: progress 2s ease-in-out infinite;
+        }
+        
+        @keyframes progress {
+            0% { width: 0%; }
+            50% { width: 70%; }
+            100% { width: 100%; }
+        }
+        
+        .error-box {
+            background: rgba(255, 71, 87, 0.1);
+            border: 1px solid var(--error);
+            border-radius: 6px;
+            padding: 0.75rem;
+            color: var(--error);
+            font-size: 0.9rem;
+            display: none;
+            margin-top: 0.75rem;
+        }
+        
+        .error-box.show {
+            display: block;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 0.5rem;
+            color: var(--text-secondary);
+            font-size: 0.75rem;
         }
         
         footer a {
@@ -314,21 +309,28 @@
             text-decoration: none;
         }
         
-        @media (max-width: 600px) {
-            body {
-                padding: 1rem;
+        /* Responsive */
+        @media (max-width: 900px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .panel-content {
+                min-height: 300px;
+            }
+        }
+        
+        @media (min-width: 1600px) {
+            .container {
+                max-width: 1600px;
             }
             
             h1 {
-                font-size: 1.8rem;
+                font-size: 1.75rem;
             }
             
-            .card {
-                padding: 1.5rem;
-            }
-            
-            .upload-zone {
-                padding: 2rem 1rem;
+            #result-text {
+                font-size: 0.95rem;
             }
         }
     </style>
@@ -337,48 +339,49 @@
     <div class="container">
         <header>
             <h1>🧠 GLM-OCR</h1>
-            <p class="subtitle">Распознавание текста с изображений</p>
-        </header>
-        
-        <div class="card">
             <div class="status-indicator">
                 <span class="status-dot" id="status-dot"></span>
                 <span id="status-text">Проверка сервера...</span>
             </div>
-        </div>
+        </header>
         
-        <div class="card">
-            <div class="upload-zone" id="upload-zone">
-                <div class="upload-icon">📄</div>
-                <div class="upload-text">Перетащите изображение или нажмите для выбора</div>
-                <div class="upload-hint">PNG, JPG, WebP, GIF • до 20MB</div>
-                <input type="file" id="file-input" accept="image/*">
-            </div>
-            
-            <div id="preview-container">
-                <img id="preview-image" alt="Предпросмотр">
-            </div>
-            
-            <button class="btn" id="process-btn" disabled>
-                🔍 Распознать текст
-            </button>
-            
-            <div class="progress" id="progress">
-                <div class="progress-bar">
-                    <div class="progress-fill"></div>
+        <div class="main-grid">
+            <div class="panel">
+                <div class="panel-header">📷 Изображение</div>
+                <div class="panel-content">
+                    <div class="upload-zone" id="upload-zone">
+                        <div class="upload-icon">📄</div>
+                        <div class="upload-text">Перетащите или нажмите для выбора</div>
+                        <div class="upload-hint">PNG, JPG, WebP, GIF • до 20MB</div>
+                        <input type="file" id="file-input" accept="image/*">
+                    </div>
+                    <div id="preview-container">
+                        <img id="preview-image" alt="Предпросмотр">
+                    </div>
+                    <div class="btn-row">
+                        <button class="btn" id="process-btn" disabled>🔍 Распознать</button>
+                        <button class="btn btn-secondary" id="clear-btn" style="display:none">✕ Очистить</button>
+                    </div>
+                    <div class="progress" id="progress">
+                        <div class="progress-bar">
+                            <div class="progress-fill"></div>
+                        </div>
+                    </div>
+                    <div class="error-box" id="error-box"></div>
                 </div>
-                <div class="progress-text">Обработка...</div>
             </div>
             
-            <div class="error-box" id="error-box"></div>
-        </div>
-        
-        <div class="card result-card" id="result-card">
-            <div class="result-header">
-                <span class="result-title">📝 Распознанный текст</span>
-                <button class="copy-btn" id="copy-btn">📋 Копировать</button>
+            <div class="panel">
+                <div class="panel-header">📝 Результат</div>
+                <div class="panel-content">
+                    <div id="result-text" style="color: var(--text-secondary); font-style: italic;">
+                        Загрузите изображение для распознавания текста
+                    </div>
+                    <div class="btn-row">
+                        <button class="btn btn-secondary" id="copy-btn" disabled>📋 Копировать</button>
+                    </div>
+                </div>
             </div>
-            <div class="result-text" id="result-text"></div>
         </div>
         
         <footer>
@@ -392,8 +395,8 @@
         const previewContainer = document.getElementById('preview-container');
         const previewImage = document.getElementById('preview-image');
         const processBtn = document.getElementById('process-btn');
+        const clearBtn = document.getElementById('clear-btn');
         const progress = document.getElementById('progress');
-        const resultCard = document.getElementById('result-card');
         const resultText = document.getElementById('result-text');
         const errorBox = document.getElementById('error-box');
         const copyBtn = document.getElementById('copy-btn');
@@ -405,21 +408,15 @@
         // Health check - actually verify llama-server is ready
         async function checkHealth() {
             try {
-                // /api/health checks llama-server /health endpoint
-                // Returns 200 only when model is loaded and ready
                 const res = await fetch('/api/health', { signal: AbortSignal.timeout(5000) });
-                
                 if (res.ok) {
                     statusDot.classList.add('ready');
                     statusDot.classList.remove('error');
                     statusText.textContent = 'Сервер готов';
-                    return; // Ready, stop polling
+                    return;
                 }
-            } catch (e) {
-                // Server not responding yet
-            }
+            } catch (e) {}
             
-            // Not ready - show status and retry
             statusDot.classList.remove('ready');
             statusText.textContent = 'Сервер запускается...';
             setTimeout(checkHealth, 2000);
@@ -429,39 +426,24 @@
         
         // Drag & drop
         ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(event => {
-            uploadZone.addEventListener(event, e => {
-                e.preventDefault();
-                e.stopPropagation();
-            });
+            uploadZone.addEventListener(event, e => { e.preventDefault(); e.stopPropagation(); });
         });
         
         ['dragenter', 'dragover'].forEach(event => {
-            uploadZone.addEventListener(event, () => {
-                uploadZone.classList.add('dragover');
-            });
+            uploadZone.addEventListener(event, () => uploadZone.classList.add('dragover'));
         });
         
         ['dragleave', 'drop'].forEach(event => {
-            uploadZone.addEventListener(event, () => {
-                uploadZone.classList.remove('dragover');
-            });
+            uploadZone.addEventListener(event, () => uploadZone.classList.remove('dragover'));
         });
         
         uploadZone.addEventListener('drop', e => {
-            const files = e.dataTransfer.files;
-            if (files.length > 0) {
-                handleFile(files[0]);
-            }
+            if (e.dataTransfer.files.length > 0) handleFile(e.dataTransfer.files[0]);
         });
         
-        uploadZone.addEventListener('click', () => {
-            fileInput.click();
-        });
-        
+        uploadZone.addEventListener('click', () => fileInput.click());
         fileInput.addEventListener('change', e => {
-            if (e.target.files.length > 0) {
-                handleFile(e.target.files[0]);
-            }
+            if (e.target.files.length > 0) handleFile(e.target.files[0]);
         });
         
         function handleFile(file) {
@@ -469,25 +451,39 @@
                 showError('Выберите файл изображения');
                 return;
             }
-            
             if (file.size > 20 * 1024 * 1024) {
                 showError('Файл слишком большой (макс. 20MB)');
                 return;
             }
             
             selectedFile = file;
-            
             const reader = new FileReader();
             reader.onload = e => {
                 previewImage.src = e.target.result;
                 previewContainer.classList.add('show');
-                uploadZone.classList.add('has-image');
+                uploadZone.style.display = 'none';
                 processBtn.disabled = false;
+                clearBtn.style.display = 'block';
                 hideError();
-                resultCard.classList.remove('show');
+                resultText.style.color = 'var(--text-secondary)';
+                resultText.style.fontStyle = 'italic';
+                resultText.textContent = 'Нажмите "Распознать" для обработки';
+                copyBtn.disabled = true;
             };
             reader.readAsDataURL(file);
         }
+        
+        clearBtn.addEventListener('click', () => {
+            selectedFile = null;
+            previewContainer.classList.remove('show');
+            uploadZone.style.display = 'flex';
+            processBtn.disabled = true;
+            clearBtn.style.display = 'none';
+            resultText.style.color = 'var(--text-secondary)';
+            resultText.style.fontStyle = 'italic';
+            resultText.textContent = 'Загрузите изображение для распознавания текста';
+            copyBtn.disabled = true;
+        });
         
         processBtn.addEventListener('click', async () => {
             if (!selectedFile) return;
@@ -496,37 +492,40 @@
             formData.append('file', selectedFile);
             
             processBtn.disabled = true;
+            clearBtn.disabled = true;
             progress.classList.add('show');
             hideError();
+            resultText.style.color = 'var(--text-secondary)';
+            resultText.style.fontStyle = 'italic';
+            resultText.textContent = 'Обработка...';
             
             try {
-                const res = await fetch('/api/ocr', {
-                    method: 'POST',
-                    body: formData
-                });
-                
+                const res = await fetch('/api/ocr', { method: 'POST', body: formData });
                 const data = await res.json();
                 
                 if (data.success) {
-                    resultText.textContent = data.text;
-                    resultCard.classList.add('show');
+                    resultText.style.color = 'var(--text-primary)';
+                    resultText.style.fontStyle = 'normal';
+                    resultText.textContent = data.text || 'Текст не распознан';
+                    copyBtn.disabled = false;
                 } else {
                     showError(data.error || 'Ошибка распознавания');
+                    resultText.textContent = 'Ошибка';
                 }
             } catch (e) {
                 showError('Ошибка соединения: ' + e.message);
+                resultText.textContent = 'Ошибка';
             } finally {
-                progress.classList.remove('show');
                 processBtn.disabled = false;
+                clearBtn.disabled = false;
+                progress.classList.remove('show');
             }
         });
         
         copyBtn.addEventListener('click', () => {
             navigator.clipboard.writeText(resultText.textContent).then(() => {
                 copyBtn.textContent = '✓ Скопировано';
-                setTimeout(() => {
-                    copyBtn.textContent = '📋 Копировать';
-                }, 2000);
+                setTimeout(() => copyBtn.textContent = '📋 Копировать', 1500);
             });
         });
         
