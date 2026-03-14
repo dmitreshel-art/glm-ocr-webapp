@@ -1,21 +1,53 @@
 # GLM-OCR WebApp - Startup Scripts for Windows
 
-## Option 1: HIP GPU Acceleration (Recommended - ~10x faster)
+## Quick Start
+
+### Option 1: HIP GPU Acceleration (Recommended - ~10x faster)
 
 ```powershell
-# Start HIP llama-server on Windows (GPU)
+# Start HIP llama-server (GPU)
 .\start-hip.ps1
 
 # In another terminal, start WebApp
-docker-compose up -d
+.\update.cmd
 ```
 
-## Option 2: Docker CPU Mode (Slower but simpler)
+### Option 2: Docker CPU Mode (Slower but simpler)
+
+```powershell
+# Start both in Docker (CPU-only)
+.\update.cmd cpu
+```
+
+---
+
+## Detailed Commands
+
+### HIP GPU Mode (Radeon 890M)
+
+```powershell
+# Start HIP llama-server (port 8765, GPU)
+.\start-hip.ps1
+
+# Start WebApp (port 8080, connects to HIP)
+.\update.cmd
+```
+
+### Docker CPU Mode
 
 ```powershell
 # Start both llama-server and WebApp in Docker
-.\start-cpu.ps1
+.\update.cmd cpu
 ```
+
+### Stopping
+
+```powershell
+# Stop all instances
+.\stop.ps1
+```
+
+---
 
 ## Architecture
 
@@ -38,12 +70,19 @@ Option 2 (Docker CPU):
 └─────────────────────────────────────────────┘
 ```
 
-## Stopping
+---
 
-```powershell
-# Stop all instances
-.\stop.ps1
-```
+## update.cmd Commands
+
+| Command | Description |
+|---------|-------------|
+| `update.cmd` | Start WebApp (HIP mode) |
+| `update.cmd cpu` | Start both in Docker (CPU mode) |
+| `update.cmd down` | Stop WebApp |
+| `update.cmd logs` | View logs |
+| `update.cmd status` | Container status |
+
+---
 
 ## Ports
 
