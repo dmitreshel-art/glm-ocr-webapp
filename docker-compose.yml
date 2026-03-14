@@ -10,18 +10,17 @@ services:
       - "8765:8080"
     volumes:
       - ./hf-cache:/root/.cache/llama.cpp
-    # AMD GPU support (uncomment for Radeon RX 7000 / Ryzen AI):
-    # devices:
-    #   - /dev/kfd
-    #   - /dev/dri
-    # environment:
-    #   - HSA_OVERRIDE_GFX_VERSION=11.5.1  # Radeon 890M (Ryzen HX370)
+    devices:
+      - /dev/kfd
+      - /dev/dri
+    environment:
+      - HSA_OVERRIDE_GFX_VERSION=11.5.1  # Radeon 890M (Ryzen HX370)
     command: >
       -hf ggml-org/GLM-OCR-GGUF
       --port 8080
       --host 0.0.0.0
       --ctx-size 8192
-      --n-gpu-layers 0
+      --n-gpu-layers 999
     restart: unless-stopped
     deploy:
       resources:
