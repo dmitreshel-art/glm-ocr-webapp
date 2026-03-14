@@ -43,6 +43,7 @@ function Clean-All {
 
 function Show-Help {
     Write-Host @"
+
 GLM-OCR PowerShell Script
 
 Usage: .\update.ps1 [command]
@@ -65,22 +66,36 @@ Examples:
 }
 
 # Main
-switch ($Command) {
-    "update" { Update-Git }
-    "build" { Build-Docker }
-    "up" { Start-Containers }
-    "down" { Stop-Containers }
-    "logs" { Show-Logs }
-    "status" { Show-Status }
-    "clean" { Clean-All }
-    "help" { Show-Help }
-    "all" {
-        Update-Git
-        Build-Docker
-        Start-Containers
-    }
-    default {
-        Write-Host "Unknown command: $Command" -ForegroundColor Red
-        Show-Help
-    }
+if ($Command -eq "update") {
+    Update-Git
+}
+elseif ($Command -eq "build") {
+    Build-Docker
+}
+elseif ($Command -eq "up") {
+    Start-Containers
+}
+elseif ($Command -eq "down") {
+    Stop-Containers
+}
+elseif ($Command -eq "logs") {
+    Show-Logs
+}
+elseif ($Command -eq "status") {
+    Show-Status
+}
+elseif ($Command -eq "clean") {
+    Clean-All
+}
+elseif ($Command -eq "help") {
+    Show-Help
+}
+elseif ($Command -eq "all") {
+    Update-Git
+    Build-Docker
+    Start-Containers
+}
+else {
+    Write-Host "Unknown command: $Command" -ForegroundColor Red
+    Show-Help
 }
