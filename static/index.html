@@ -404,44 +404,45 @@
         
         // Health check
         let startupAttempts = 0;
+        const maxAttempts = 60; // 2 minutes max
         
         async function checkHealth() {
             try {
-                // Check llama-server through webapp proxy
-                const res = await fetch('/api/health');
+                // Check llama-server health - returns 200 only when model loaded
+                const res = await fetch('/api/health', { signal: AbortSignal.timeout(5000) });
                 const data = await res.json();
                 
-                if (data.status === 'ok') {
+                if (data.status === 'ok' && res.ok) {
                     statusDot.classList.add('ready');
                     statusDot.classList.remove('error');
                     statusText.textContent = 'Сервер готов';
-                } else {
-                    startupAttempts++;
-                    statusDot.classList.remove('ready');
-                    
-                    if (startupAttempts > 10) {
-                        statusText.textContent = 'Скачивание модели (первый запуск)...';
-                    } else {
-                        statusText.textContent = 'Сервер запускается...';
-                    }
-                    
-                    setTimeout(checkHealth, 2000);
+                    return; // Done, stop polling
                 }
             } catch (e) {
-                startupAttempts++;
-                statusDot.classList.remove('ready');
-                
-                if (startupAttempts > 5) {
-                    // First run - downloading model
-                    statusText.textContent = 'Скачивание модели (~1 GB)...';
-                    statusDot.classList.remove('error');
-                } else {
-                    statusDot.classList.add('error');
-                    statusText.textContent = 'Сервер запускается...';
-                }
-                
-                setTimeout(checkHealth, 2000);
+                // Server not ready yet
             }
+            
+            startupAttempts++;
+            statusDot.classList.remove('ready');
+            
+            if (startupAttempts > maxAttempts) {
+                statusDot.classList.add('error');
+                statusText.textContent = 'Ошибка: сервер не запустился';
+                return; // Stop polling
+            }
+            
+            // Show appropriate message based on attempts
+            if (startupAttempts > 30) {
+                statusText.textContent = 'Скачивание модели (первый запуск может занять несколько минут)...';
+                statusDot.classList.remove('error'); // Not an error, just downloading
+            } else if (startupAttempts > 10) {
+                statusText.textContent = 'Загрузка модели...';
+            } else {
+                statusText.textContent = 'Сервер запускается...';
+            }
+            
+            // Retry in 2 seconds
+            setTimeout(checkHealth, 2000);
         }
         
         checkHealth();
