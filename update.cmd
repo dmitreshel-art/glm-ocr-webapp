@@ -9,7 +9,6 @@ if "%1"=="down" goto down
 if "%1"=="logs" goto logs
 if "%1"=="status" goto status
 if "%1"=="clean" goto clean
-if "%1"=="help" goto help
 goto unknown
 
 :all
@@ -58,26 +57,8 @@ docker-compose down -v --rmi local
 echo ✅ Clean complete
 goto end
 
-:help
-echo.
-echo GLM-OCR Batch Script
-echo.
-echo Usage: update.bat [command]
-echo.
-echo Commands:
-echo   update    - Pull latest changes from GitHub
-echo   build     - Build Docker images
-echo   up        - Start containers
-echo   down      - Stop containers
-echo   logs      - Show container logs
-echo   status    - Show container status
-echo   clean     - Remove containers, images, volumes
-echo   all       - Update, build, and start (default)
-echo.
-goto end
-
 :unknown
 echo Unknown command: %1
-goto help
+echo Usage: update.cmd [update^|build^|up^|down^|logs^|status^|clean]
 
 :end
