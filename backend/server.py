@@ -105,35 +105,52 @@ async def llama_health():
         return {"status": "error", "message": str(e)}
 
 
-async def ocr_image(image_data: bytes, mime_type: str) -> str:
+async def ocr_image(image_data: bytes, mime_type: str, page_num: int = None) -> str:
     """Process single image and return OCR text."""
-    image_base64 = base64.b64encode(image_data).decode("utf-8")
-    image_url = f"data:{mime_type};base64,{image_base64}"
+    page_label = f"page {page_num}" if page_num else "image"
+    print(f"[OCR] Processing {page_label}...")
     
-    prompt = "Recognize all text in this image. Output only the text without any comments."
-    
-    async with httpx.AsyncClient(timeout=120.0) as client:
-        response = await client.post(
-            f"{LLAMA_SERVER_URL}/v1/chat/completions",
-            json={
-                "model": "glm-ocr",
-                "messages": [{
-                    "role": "user",
-                    "content": [
-                        {"type": "text", "text": prompt},
-                        {"type": "image_url", "image_url": {"url": image_url}}
-                    ]
-                }],
-                "max_tokens": 2048,
-                "temperature": 0.1
-            }
-        )
+    try:
+        image_base64 = base64.b64encode(image_data).decode("utf-8")
+        image_url = f"data:{mime_type};base64,{image_base64}"
         
-        if response.status_code != 200:
-            raise HTTPException(500, f"OCR failed: {response.text[:200]}")
+        prompt = "Recognize all text in this image. Output only the text without any comments."
         
-        result = response.json()
-        return result.get("choices", [{}])[0].get("message", {}).get("content", "")
+        async with httpx.AsyncClient(timeout=180.0) as client:
+            response = await client.post(
+                f"{LLAMA_SERVER_URL}/v1/chat/completions",
+                json={
+                    "model": "glm-ocr",
+                    "messages": [{
+                        "role": "user",
+                        "content": [
+                            {"type": "text", "text": prompt},
+                            {"type": "image_url", "image_url": {"url": image_url}}
+                        ]
+                    }],
+                    "max_tokens": 2048,
+                    "temperature": 0.1
+                }
+            )
+            
+            if response.status_code != 200:
+                error_text = response.text[:500]
+                print(f"[OCR] Error on {page_label}: {response.status_code} - {error_text}")
+                raise HTTPException(500, f"OCR failed on {page_label}: {response.status_code}")
+            
+            result = response.json()
+            text = result.get("choices", [{}])[0].get("message", {}).get("content", "")
+            print(f"[OCR] {page_label} done: {len(text)} chars")
+            return text.strip()
+            
+    except httpx.TimeoutException:
+        print(f"[OCR] Timeout on {page_label}")
+        raise HTTPException(504, f"Timeout processing {page_label}")
+    except Exception as e:
+        print(f"[OCR] Unexpected error on {page_label}: {e}")
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(500, f"Error on {page_label}: {str(e)}")
 
 
 @app.post("/api/ocr")
@@ -157,10 +174,15 @@ async def process_ocr(file: UploadFile = File(...)):
             
             results = []
             for i, (page_data, mime_type) in enumerate(pages):
-                print(f"[OCR] Processing page {i + 1}/{len(pages)}")
-                resized_data, _ = resize_image(page_data)
-                text = await ocr_image(resized_data, mime_type)
-                results.append({"page": i + 1, "text": text.strip()})
+                try:
+                    print(f"[OCR] Processing page {i + 1}/{len(pages)}")
+                    resized_data, _ = resize_image(page_data)
+                    text = await ocr_image(resized_data, mime_type, page_num=i + 1)
+                    results.append({"page": i + 1, "text": text.strip()})
+                    print(f"[OCR] Page {i + 1}/{len(pages)} completed")
+                except Exception as e:
+                    print(f"[OCR] ERROR on page {i + 1}: {e}")
+                    results.append({"page": i + 1, "text": f"[ERROR: {str(e)}]", "error": True})
             
             # Combine all pages
             combined_text = "\n\n--- Page Break ---\n\n".join(r["text"] for r in results)
