@@ -10,7 +10,7 @@ services:
     volumes:
       - hf-cache:/root/.cache/llama.cpp
     command: >
-      -hf ggml-org/GLM-OCR-GGUF:mmproj-GLM-OCR-Q8_0.gguf,GLM-OCR-Q8_0.gguf
+      -hf ggml-org/GLM-OCR-GGUF
       --port 8080
       --host 0.0.0.0
       --ctx-size 4096
