@@ -172,7 +172,6 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            min-height: 200px;
             background: var(--bg-main);
         }
         
@@ -220,21 +219,20 @@
         
         #preview-container {
             display: none;
-            flex: 1;
-            min-height: 0;
             max-height: 300px;
-            justify-content: center;
-            align-items: center;
             overflow: hidden;
+            flex-shrink: 0;
         }
         
         #preview-container.visible {
             display: flex;
+            justify-content: center;
+            align-items: center;
         }
         
         #preview-image {
             max-width: 100%;
-            max-height: 100%;
+            max-height: 300px;
             object-fit: contain;
             border-radius: 8px;
             border: 1px solid var(--border);
@@ -242,10 +240,9 @@
         
         #pdf-container {
             display: none;
-            flex: 1;
-            min-height: 0;
             max-height: 300px;
             overflow-y: auto;
+            flex-shrink: 0;
         }
         
         #pdf-container.visible {
