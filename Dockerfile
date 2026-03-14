@@ -9,8 +9,7 @@ WORKDIR /build
 RUN git clone --depth 1 https://github.com/ggml-org/llama.cpp.git \
     && cd llama.cpp \
     && cmake -B build -DGGML_CUDA=OFF \
-    && cmake --build build --config Release -j$(nproc) \
-    && cp build/bin/llama-server /usr/local/bin/
+    && cmake --build build --config Release -j$(nproc)
 
 # Download model
 RUN mkdir -p /models \
@@ -19,11 +18,21 @@ RUN mkdir -p /models \
     && wget -q -O /models/mmproj.gguf \
     "https://huggingface.co/ggml-org/GLM-OCR-GGUF/resolve/main/mmproj-GLM-OCR-Q8_0.gguf"
 
-# Runtime
+# Runtime - use same base to preserve shared libraries
 FROM python:3.11-slim
 
-COPY --from=builder /usr/local/bin/llama-server /usr/local/bin/
+# Install runtime dependencies
+RUN apt-get update && apt-get install -y \
+    libgomp1 \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy llama-server and its libraries from builder
+COPY --from=builder /build/llama.cpp/build/bin/llama-server /usr/local/bin/
+COPY --from=builder /build/llama.cpp/build/bin/libmtmd.so.0 /usr/local/lib/
 COPY --from=builder /models /models
+
+# Update library path
+ENV LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
 
 WORKDIR /app
 COPY requirements.txt .
