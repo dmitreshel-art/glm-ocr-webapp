@@ -12,47 +12,110 @@
         }
         
         :root {
-            --bg-primary: #0a0a1a;
-            --bg-deep: #050510;
-            --glass-bg: rgba(255, 255, 255, 0.06);
-            --glass-border: rgba(255, 255, 255, 0.15);
-            --glass-border-light: rgba(255, 255, 255, 0.25);
+            --glass-tint: rgba(20, 20, 35, 0.65);
+            --glass-border: rgba(255, 255, 255, 0.18);
+            --glass-border-light: rgba(255, 255, 255, 0.08);
             --accent-cyan: #00d4ff;
             --accent-purple: #a855f7;
-            --accent-pink: #ec4899;
+            --accent-blue: #3b82f6;
             --text-primary: #ffffff;
-            --text-secondary: rgba(255, 255, 255, 0.7);
+            --text-secondary: rgba(255, 255, 255, 0.75);
             --text-muted: rgba(255, 255, 255, 0.5);
-            --glow-cyan: rgba(0, 212, 255, 0.3);
-            --glow-purple: rgba(168, 85, 247, 0.3);
         }
         
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif;
             min-height: 100vh;
-            background: var(--bg-primary);
+            background: #0a0a12;
             color: var(--text-primary);
-            position: relative;
             overflow-x: hidden;
+            position: relative;
         }
         
-        /* Animated gradient background */
-        body::before {
-            content: '';
+        /* Animated background blobs */
+        .bg-blob {
             position: fixed;
-            inset: 0;
-            background: 
-                radial-gradient(ellipse 80% 60% at 20% 10%, rgba(99, 102, 241, 0.15) 0%, transparent 50%),
-                radial-gradient(ellipse 60% 50% at 80% 20%, rgba(236, 72, 153, 0.12) 0%, transparent 50%),
-                radial-gradient(ellipse 50% 40% at 60% 80%, rgba(0, 212, 255, 0.1) 0%, transparent 50%),
-                radial-gradient(ellipse 40% 30% at 10% 90%, rgba(168, 85, 247, 0.1) 0%, transparent 50%);
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.6;
             z-index: -1;
-            animation: gradientShift 20s ease-in-out infinite alternate;
+            animation: float 20s ease-in-out infinite;
         }
         
-        @keyframes gradientShift {
-            0% { transform: scale(1) rotate(0deg); }
-            100% { transform: scale(1.1) rotate(5deg); }
+        .bg-blob-1 {
+            width: 600px;
+            height: 600px;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue));
+            top: -200px;
+            left: -200px;
+            animation-delay: 0s;
+        }
+        
+        .bg-blob-2 {
+            width: 500px;
+            height: 500px;
+            background: linear-gradient(135deg, var(--accent-purple), var(--accent-cyan));
+            bottom: -150px;
+            right: -150px;
+            animation-delay: -5s;
+        }
+        
+        .bg-blob-3 {
+            width: 400px;
+            height: 400px;
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            animation-delay: -10s;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            25% { transform: translate(30px, -30px) scale(1.05); }
+            50% { transform: translate(-20px, 20px) scale(0.95); }
+            75% { transform: translate(20px, 30px) scale(1.02); }
+        }
+        
+        /* Glass effect */
+        .glass {
+            background: var(--glass-tint);
+            backdrop-filter: blur(40px) saturate(150%);
+            -webkit-backdrop-filter: blur(40px) saturate(150%);
+            border-radius: 24px;
+            border: 1px solid var(--glass-border);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        /* Inner glass reflection */
+        .glass::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(
+                135deg,
+                rgba(255, 255, 255, 0.1) 0%,
+                transparent 50%
+            );
+            pointer-events: none;
+        }
+        
+        /* Glass top highlight */
+        .glass::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                rgba(255, 255, 255, 0.3),
+                transparent
+            );
+            pointer-events: none;
         }
         
         .container {
@@ -70,28 +133,8 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 0.75rem 1.25rem;
+            padding: 1rem 1.5rem;
             margin-bottom: 1.5rem;
-            background: linear-gradient(135deg, rgba(255,255,255,0.12), rgba(255,255,255,0.04));
-            backdrop-filter: blur(20px) saturate(180%);
-            -webkit-backdrop-filter: blur(20px) saturate(180%);
-            border-radius: 20px;
-            border: 1px solid var(--glass-border);
-            box-shadow: 
-                0 8px 32px rgba(0, 0, 0, 0.2),
-                inset 0 1px 0 rgba(255, 255, 255, 0.15),
-                inset 0 -1px 0 rgba(0, 0, 0, 0.1);
-            position: relative;
-            overflow: hidden;
-        }
-        
-        /* Glass inner glow */
-        header::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, transparent 50%);
-            pointer-events: none;
         }
         
         .logo {
@@ -101,14 +144,14 @@
         }
         
         .logo-icon {
-            font-size: 1.5rem;
-            filter: drop-shadow(0 0 10px var(--glow-cyan));
+            font-size: 1.75rem;
+            filter: drop-shadow(0 0 8px var(--accent-cyan));
         }
         
         .logo-text {
-            font-size: 1.25rem;
-            font-weight: 600;
-            background: linear-gradient(135deg, var(--accent-cyan) 0%, var(--accent-purple) 50%, var(--accent-pink) 100%);
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #fff 0%, var(--accent-cyan) 50%, var(--accent-purple) 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
@@ -119,12 +162,11 @@
             display: flex;
             align-items: center;
             gap: 0.5rem;
-            font-size: 0.85rem;
-            color: var(--text-secondary);
             padding: 0.5rem 1rem;
-            background: rgba(255,255,255,0.05);
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(20px);
             border-radius: 100px;
-            border: 1px solid rgba(255,255,255,0.08);
+            border: 1px solid var(--glass-border-light);
         }
         
         .status-dot {
@@ -137,12 +179,12 @@
         
         .status-dot.ready {
             background: var(--accent-cyan);
-            box-shadow: 0 0 12px var(--glow-cyan);
+            box-shadow: 0 0 12px var(--accent-cyan), 0 0 24px rgba(0, 212, 255, 0.4);
         }
         
-        .status-dot.error {
-            background: #ff4757;
-            box-shadow: 0 0 12px rgba(255, 71, 87, 0.5);
+        .status-text {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
         }
         
         /* Main Grid */
@@ -154,71 +196,48 @@
             min-height: 0;
         }
         
-        /* Glass Panel */
+        /* Panel */
         .panel {
-            background: linear-gradient(135deg, rgba(255,255,255,0.12), rgba(255,255,255,0.04));
-            backdrop-filter: blur(20px) saturate(180%);
-            -webkit-backdrop-filter: blur(20px) saturate(180%);
-            border-radius: 24px;
-            border: 1px solid var(--glass-border);
-            box-shadow: 
-                0 8px 32px rgba(0, 0, 0, 0.2),
-                inset 0 1px 0 rgba(255, 255, 255, 0.15);
             display: flex;
             flex-direction: column;
-            overflow: hidden;
-            position: relative;
-        }
-        
-        .panel::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(135deg, rgba(255,255,255,0.08) 0%, transparent 60%);
-            pointer-events: none;
-            border-radius: inherit;
+            padding: 1.25rem;
         }
         
         .panel-header {
-            padding: 1rem 1.25rem;
-            border-bottom: 1px solid rgba(255,255,255,0.08);
+            font-size: 0.8rem;
             font-weight: 600;
-            color: var(--text-secondary);
-            font-size: 0.85rem;
-            letter-spacing: 0.02em;
             text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-muted);
+            margin-bottom: 1rem;
         }
         
         .panel-content {
             flex: 1;
-            padding: 1rem;
             display: flex;
             flex-direction: column;
             min-height: 0;
-            position: relative;
         }
         
         /* Upload Zone */
         .upload-zone {
-            border: 2px dashed rgba(255,255,255,0.15);
-            border-radius: 16px;
-            padding: 2rem;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
             flex: 1;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             min-height: 200px;
-            position: relative;
+            border: 2px dashed var(--glass-border);
+            border-radius: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.02);
         }
         
         .upload-zone:hover, .upload-zone.dragover {
             border-color: var(--accent-cyan);
             background: rgba(0, 212, 255, 0.05);
-            box-shadow: inset 0 0 30px rgba(0, 212, 255, 0.05);
+            box-shadow: 0 0 30px rgba(0, 212, 255, 0.1);
         }
         
         .upload-zone.has-image {
@@ -226,20 +245,20 @@
         }
         
         .upload-icon {
-            font-size: 2.5rem;
+            font-size: 3rem;
             margin-bottom: 0.75rem;
             opacity: 0.8;
         }
         
         .upload-text {
             color: var(--text-secondary);
-            font-size: 0.95rem;
+            font-size: 1rem;
             margin-bottom: 0.5rem;
         }
         
         .upload-hint {
             color: var(--text-muted);
-            font-size: 0.8rem;
+            font-size: 0.85rem;
         }
         
         #file-input {
@@ -268,23 +287,19 @@
         /* Buttons */
         .btn-row {
             display: flex;
-            gap: 0.5rem;
-            margin-top: 0.75rem;
+            gap: 0.75rem;
+            margin-top: 1rem;
         }
         
         .btn {
-            background: linear-gradient(135deg, rgba(255,255,255,0.2), rgba(255,255,255,0.08));
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            color: var(--text-primary);
-            border: 1px solid rgba(255,255,255,0.2);
-            padding: 0.7rem 1.5rem;
-            border-radius: 12px;
-            font-size: 0.9rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.3s ease;
             flex: 1;
+            padding: 0.875rem 1.5rem;
+            border-radius: 14px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: none;
             position: relative;
             overflow: hidden;
         }
@@ -293,7 +308,7 @@
             content: '';
             position: absolute;
             inset: 0;
-            background: linear-gradient(135deg, rgba(255,255,255,0.1), transparent);
+            background: linear-gradient(135deg, rgba(255,255,255,0.15), transparent 60%);
             opacity: 0;
             transition: opacity 0.3s;
         }
@@ -302,37 +317,39 @@
             opacity: 1;
         }
         
-        .btn:hover:not(:disabled) {
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue));
+            color: white;
+            box-shadow: 0 4px 20px rgba(0, 212, 255, 0.3);
+        }
+        
+        .btn-primary:hover:not(:disabled) {
             transform: translateY(-2px);
-            box-shadow: 0 8px 24px rgba(0, 212, 255, 0.2);
-            border-color: rgba(0, 212, 255, 0.4);
+            box-shadow: 0 8px 30px rgba(0, 212, 255, 0.4);
+        }
+        
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border-light);
+            color: var(--text-secondary);
+        }
+        
+        .btn-secondary:hover:not(:disabled) {
+            background: rgba(255, 255, 255, 0.12);
+            border-color: rgba(255, 255, 255, 0.25);
         }
         
         .btn:disabled {
             opacity: 0.4;
             cursor: not-allowed;
-            transform: none;
-        }
-        
-        .btn-primary {
-            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
-            border: none;
-            box-shadow: 0 4px 16px rgba(0, 212, 255, 0.3);
-        }
-        
-        .btn-primary:hover:not(:disabled) {
-            box-shadow: 0 8px 24px rgba(0, 212, 255, 0.4);
-        }
-        
-        .btn-secondary {
-            background: rgba(255,255,255,0.05);
-            border-color: rgba(255,255,255,0.1);
+            transform: none !important;
         }
         
         /* Progress */
         .progress {
             display: none;
-            margin-top: 0.75rem;
+            margin-top: 1rem;
         }
         
         .progress.show {
@@ -340,8 +357,8 @@
         }
         
         .progress-bar {
-            height: 3px;
-            background: rgba(255,255,255,0.1);
+            height: 4px;
+            background: rgba(255, 255, 255, 0.1);
             border-radius: 2px;
             overflow: hidden;
         }
@@ -351,6 +368,7 @@
             background: linear-gradient(90deg, var(--accent-cyan), var(--accent-purple));
             width: 0%;
             animation: progress 2s ease-in-out infinite;
+            border-radius: 2px;
         }
         
         @keyframes progress {
@@ -361,15 +379,15 @@
         
         /* Error */
         .error-box {
+            display: none;
+            margin-top: 1rem;
+            padding: 0.875rem 1rem;
             background: rgba(255, 71, 87, 0.1);
+            backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 71, 87, 0.3);
             border-radius: 12px;
-            padding: 0.75rem;
             color: #ff6b6b;
             font-size: 0.9rem;
-            display: none;
-            margin-top: 0.75rem;
-            backdrop-filter: blur(10px);
         }
         
         .error-box.show {
@@ -378,32 +396,36 @@
         
         /* Result */
         #result-text {
+            flex: 1;
             background: rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(255,255,255,0.08);
+            border: 1px solid var(--glass-border-light);
             border-radius: 12px;
             padding: 1rem;
-            font-family: 'SF Mono', 'Consolas', 'Monaco', monospace;
+            font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
             font-size: 0.9rem;
             line-height: 1.6;
             white-space: pre-wrap;
             word-wrap: break-word;
-            flex: 1;
             overflow-y: auto;
             color: var(--text-primary);
         }
         
         #result-text::-webkit-scrollbar {
-            width: 6px;
+            width: 8px;
         }
         
         #result-text::-webkit-scrollbar-track {
-            background: rgba(255,255,255,0.05);
-            border-radius: 3px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 4px;
         }
         
         #result-text::-webkit-scrollbar-thumb {
-            background: rgba(255,255,255,0.2);
-            border-radius: 3px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+        }
+        
+        #result-text::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.3);
         }
         
         /* Footer */
@@ -411,7 +433,7 @@
             text-align: center;
             padding: 1rem;
             color: var(--text-muted);
-            font-size: 0.75rem;
+            font-size: 0.8rem;
         }
         
         footer a {
@@ -430,10 +452,6 @@
                 grid-template-columns: 1fr;
             }
             
-            .panel-content {
-                min-height: 300px;
-            }
-            
             header {
                 flex-direction: column;
                 gap: 0.75rem;
@@ -444,33 +462,34 @@
             .container {
                 max-width: 1600px;
             }
-            
-            .logo-text {
-                font-size: 1.5rem;
-            }
         }
     </style>
 </head>
 <body>
+    <!-- Animated background -->
+    <div class="bg-blob bg-blob-1"></div>
+    <div class="bg-blob bg-blob-2"></div>
+    <div class="bg-blob bg-blob-3"></div>
+    
     <div class="container">
-        <header>
+        <header class="glass">
             <div class="logo">
                 <span class="logo-icon">🧠</span>
                 <span class="logo-text">GLM-OCR</span>
             </div>
             <div class="status-indicator">
                 <span class="status-dot" id="status-dot"></span>
-                <span id="status-text">Проверка сервера...</span>
+                <span class="status-text" id="status-text">Проверка сервера...</span>
             </div>
         </header>
         
         <div class="main-grid">
-            <div class="panel">
+            <div class="panel glass">
                 <div class="panel-header">📷 Изображение</div>
                 <div class="panel-content">
                     <div class="upload-zone" id="upload-zone">
                         <div class="upload-icon">📄</div>
-                        <div class="upload-text">Перетащите или нажмите для выбора</div>
+                        <div class="upload-text">Перетащите или нажмите</div>
                         <div class="upload-hint">PNG, JPG, WebP, GIF • до 20MB</div>
                         <input type="file" id="file-input" accept="image/*">
                     </div>
@@ -479,23 +498,19 @@
                     </div>
                     <div class="btn-row">
                         <button class="btn btn-primary" id="process-btn" disabled>🔍 Распознать</button>
-                        <button class="btn btn-secondary" id="clear-btn" style="display:none">✕ Очистить</button>
+                        <button class="btn btn-secondary" id="clear-btn" style="display:none">✕</button>
                     </div>
                     <div class="progress" id="progress">
-                        <div class="progress-bar">
-                            <div class="progress-fill"></div>
-                        </div>
+                        <div class="progress-bar"><div class="progress-fill"></div></div>
                     </div>
                     <div class="error-box" id="error-box"></div>
                 </div>
             </div>
             
-            <div class="panel">
+            <div class="panel glass">
                 <div class="panel-header">📝 Результат</div>
                 <div class="panel-content">
-                    <div id="result-text" style="color: var(--text-muted); font-style: italic;">
-                        Загрузите изображение для распознавания текста
-                    </div>
+                    <div id="result-text">Загрузите изображение для распознавания</div>
                     <div class="btn-row">
                         <button class="btn btn-secondary" id="copy-btn" disabled>📋 Копировать</button>
                     </div>
@@ -524,57 +539,31 @@
         
         let selectedFile = null;
         
-        // Health check - actually verify llama-server is ready
         async function checkHealth() {
             try {
                 const res = await fetch('/api/health', { signal: AbortSignal.timeout(5000) });
                 if (res.ok) {
                     statusDot.classList.add('ready');
-                    statusDot.classList.remove('error');
                     statusText.textContent = 'Сервер готов';
                     return;
                 }
             } catch (e) {}
-            
             statusDot.classList.remove('ready');
             statusText.textContent = 'Сервер запускается...';
             setTimeout(checkHealth, 2000);
         }
-        
         checkHealth();
         
-        // Drag & drop
-        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(event => {
-            uploadZone.addEventListener(event, e => { e.preventDefault(); e.stopPropagation(); });
-        });
-        
-        ['dragenter', 'dragover'].forEach(event => {
-            uploadZone.addEventListener(event, () => uploadZone.classList.add('dragover'));
-        });
-        
-        ['dragleave', 'drop'].forEach(event => {
-            uploadZone.addEventListener(event, () => uploadZone.classList.remove('dragover'));
-        });
-        
-        uploadZone.addEventListener('drop', e => {
-            if (e.dataTransfer.files.length > 0) handleFile(e.dataTransfer.files[0]);
-        });
-        
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(e => uploadZone.addEventListener(e, ev => { ev.preventDefault(); ev.stopPropagation(); }));
+        uploadZone.addEventListener('dragover', () => uploadZone.classList.add('dragover'));
+        uploadZone.addEventListener('dragleave', () => uploadZone.classList.remove('dragover'));
+        uploadZone.addEventListener('drop', e => { if (e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]); });
         uploadZone.addEventListener('click', () => fileInput.click());
-        fileInput.addEventListener('change', e => {
-            if (e.target.files.length > 0) handleFile(e.target.files[0]);
-        });
+        fileInput.addEventListener('change', e => { if (e.target.files.length) handleFile(e.target.files[0]); });
         
         function handleFile(file) {
-            if (!file.type.startsWith('image/')) {
-                showError('Выберите файл изображения');
-                return;
-            }
-            if (file.size > 20 * 1024 * 1024) {
-                showError('Файл слишком большой (макс. 20MB)');
-                return;
-            }
-            
+            if (!file.type.startsWith('image/')) return showError('Нужен файл изображения');
+            if (file.size > 20 * 1024 * 1024) return showError('Файл слишком большой');
             selectedFile = file;
             const reader = new FileReader();
             reader.onload = e => {
@@ -584,9 +573,7 @@
                 processBtn.disabled = false;
                 clearBtn.style.display = 'block';
                 hideError();
-                resultText.style.color = 'var(--text-muted)';
-                resultText.style.fontStyle = 'italic';
-                resultText.textContent = 'Нажмите "Распознать" для обработки';
+                resultText.textContent = 'Нажмите "Распознать"';
                 copyBtn.disabled = true;
             };
             reader.readAsDataURL(file);
@@ -598,41 +585,31 @@
             uploadZone.style.display = 'flex';
             processBtn.disabled = true;
             clearBtn.style.display = 'none';
-            resultText.style.color = 'var(--text-muted)';
-            resultText.style.fontStyle = 'italic';
-            resultText.textContent = 'Загрузите изображение для распознавания текста';
+            resultText.textContent = 'Загрузите изображение';
             copyBtn.disabled = true;
         });
         
         processBtn.addEventListener('click', async () => {
             if (!selectedFile) return;
-            
             const formData = new FormData();
             formData.append('file', selectedFile);
-            
             processBtn.disabled = true;
             clearBtn.disabled = true;
             progress.classList.add('show');
             hideError();
-            resultText.style.color = 'var(--text-muted)';
-            resultText.style.fontStyle = 'italic';
             resultText.textContent = 'Обработка...';
-            
             try {
                 const res = await fetch('/api/ocr', { method: 'POST', body: formData });
                 const data = await res.json();
-                
                 if (data.success) {
-                    resultText.style.color = 'var(--text-primary)';
-                    resultText.style.fontStyle = 'normal';
-                    resultText.textContent = data.text || 'Текст не распознан';
+                    resultText.textContent = data.text || 'Текст не найден';
                     copyBtn.disabled = false;
                 } else {
-                    showError(data.error || 'Ошибка распознавания');
+                    showError(data.error || 'Ошибка');
                     resultText.textContent = 'Ошибка';
                 }
             } catch (e) {
-                showError('Ошибка соединения: ' + e.message);
+                showError('Ошибка соединения');
                 resultText.textContent = 'Ошибка';
             } finally {
                 processBtn.disabled = false;
@@ -648,14 +625,8 @@
             });
         });
         
-        function showError(msg) {
-            errorBox.textContent = msg;
-            errorBox.classList.add('show');
-        }
-        
-        function hideError() {
-            errorBox.classList.remove('show');
-        }
+        function showError(msg) { errorBox.textContent = msg; errorBox.classList.add('show'); }
+        function hideError() { errorBox.classList.remove('show'); }
     </script>
 </body>
 </html>
