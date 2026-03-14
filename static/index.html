@@ -160,19 +160,15 @@
         }
         
         .upload-zone {
-            border: 2px dashed var(--border);
-            border-radius: 12px;
-            padding: 2.5rem 2rem;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.2s ease;
+            flex: 0 1 auto;
+            min-height: 200px;
+        }
+        
+        .panel-content {
             flex: 1;
+            padding: 1.25rem;
             display: flex;
             flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            min-height: 250px;
-            background: var(--bg-main);
         }
         
         .upload-zone:hover {
@@ -215,23 +211,26 @@
         
         #preview-container {
             display: none;
-            flex: 1;
-            min-height: 0;
+            flex: 0 1 auto;
+            max-height: 300px;
+            overflow: hidden;
+            justify-content: center;
+            align-items: center;
         }
         
         #preview-image {
             max-width: 100%;
-            max-height: 400px;
+            max-height: 280px;
             object-fit: contain;
             border-radius: 8px;
-            margin: auto;
+            border: 1px solid var(--border);
         }
         
         #pdf-container {
             display: none;
-            flex: 1;
+            flex: 0 1 auto;
+            max-height: 300px;
             overflow-y: auto;
-            min-height: 0;
         }
         
         .pdf-info {
@@ -261,6 +260,10 @@
             border-radius: 8px;
             box-shadow: var(--shadow);
             background: white;
+        }
+        
+        .btn-row {
+            flex-shrink: 0;
         }
         
         .btn-row {
