@@ -29,8 +29,11 @@ services:
     container_name: glm-ocr-web
     ports:
       - "8080:8080"
+    volumes:
+      - ./results:/app/results
     environment:
       - LLAMA_SERVER_URL=http://llama-server:8080
+      - RESULTS_DIR=/app/results
     depends_on:
       - llama-server
     restart: unless-stopped

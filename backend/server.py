@@ -7,6 +7,7 @@ import asyncio
 import base64
 import io
 import os
+from datetime import datetime
 from pathlib import Path
 
 import aiofiles
@@ -21,8 +22,10 @@ app = FastAPI(title="GLM-OCR Web", version="1.0.0")
 # Configuration - connect to separate llama-server container
 LLAMA_SERVER_URL = os.getenv("LLAMA_SERVER_URL", "http://llama-server:8080")
 UPLOAD_DIR = Path(os.getenv("UPLOAD_DIR", "/tmp/ocr-uploads"))
+RESULTS_DIR = Path(os.getenv("RESULTS_DIR", "/app/results"))
 
 UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
+RESULTS_DIR.mkdir(parents=True, exist_ok=True)
 
 # Max image dimensions for GLM-OCR (to fit in context)
 MAX_IMAGE_WIDTH = 1280
@@ -126,7 +129,18 @@ async def process_ocr(file: UploadFile = File(...)):
             result = response.json()
             text = result.get("choices", [{}])[0].get("message", {}).get("content", "")
             
-            return {"success": True, "text": text.strip()}
+            # Save result to file
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            safe_filename = "".join(c if c.isalnum() or c in "._- " else "_" for c in (file.filename or "image"))
+            result_file = RESULTS_DIR / f"{timestamp}_{safe_filename}.txt"
+            
+            async with aiofiles.open(result_file, "w", encoding="utf-8") as f:
+                await f.write(f"# OCR Result\n")
+                await f.write(f"# Source: {file.filename}\n")
+                await f.write(f"# Date: {datetime.now().isoformat()}\n\n")
+                await f.write(text.strip())
+            
+            return {"success": True, "text": text.strip(), "file_id": file_id}
             
     except httpx.TimeoutException:
         raise HTTPException(504, "OCR request timed out")
