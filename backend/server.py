@@ -64,7 +64,8 @@ def pdf_to_images(pdf_data: bytes) -> List[tuple[bytes, str]]:
         raise HTTPException(500, "PDF support not installed. Run: pip install pdf2image")
     
     try:
-        images = convert_from_bytes(pdf_data, dpi=200)
+        # Use lower DPI for faster processing and smaller images
+        images = convert_from_bytes(pdf_data, dpi=150)  # Reduced from 200
         result = []
         for img in images:
             output = io.BytesIO()

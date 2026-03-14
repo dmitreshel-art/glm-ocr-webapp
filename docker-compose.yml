@@ -14,7 +14,7 @@ services:
       -hf ggml-org/GLM-OCR-GGUF
       --port 8080
       --host 0.0.0.0
-      --ctx-size 8192
+      --ctx-size 16384
       --n-gpu-layers 0
     restart: unless-stopped
     deploy:
