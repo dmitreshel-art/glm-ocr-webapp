@@ -1,32 +1,7 @@
 version: '3.8'
 
 services:
-  # llama.cpp server - reads config from ./config.yaml
-  # Edit config.yaml to switch between Q8_0 and F16
-  llama-server:
-    image: ghcr.io/ggml-org/llama.cpp:server
-    container_name: glm-ocr-llama
-    ports:
-      - "8765:8080"
-    volumes:
-      - ./hf-cache:/root/.cache/llama.cpp
-      - ./config.yaml:/app/config.yaml:ro
-    environment:
-      - MODEL_VARIANT=${MODEL_VARIANT:-Q8_0}
-    command: >
-      -hf ggml-org/GLM-OCR-GGUF:GLM-OCR-Q8_0.gguf
-      --mmproj /root/.cache/llama.cpp/ggml-org_GLM-OCR-GGUF_mmproj-GLM-OCR-Q8_0.gguf
-      --port 8080
-      --host 0.0.0.0
-      --ctx-size 16384
-      --n-gpu-layers 0
-    restart: unless-stopped
-    deploy:
-      resources:
-        limits:
-          memory: 4G
-
-  # Python web backend
+  # Python web backend - connects to HIP llama-server on Windows host
   webapp:
     build: 
       context: .
@@ -37,8 +12,28 @@ services:
     volumes:
       - ./results:/app/results
     environment:
-      - LLAMA_SERVER_URL=http://llama-server:8080
+      - LLAMA_SERVER_URL=http://host.docker.internal:8765
       - RESULTS_DIR=/app/results
-    depends_on:
-      - llama-server
     restart: unless-stopped
+
+  # llama.cpp server (CPU-only, disabled when using HIP on host)
+  # Uncomment to use CPU-only:
+  # llama-server:
+  #   image: ghcr.io/ggml-org/llama.cpp:server
+  #   container_name: glm-ocr-llama
+  #   ports:
+  #     - "8765:8080"
+  #   volumes:
+  #     - ./hf-cache:/root/.cache/llama.cpp
+  #   command: >
+  #     -hf ggml-org/GLM-OCR-GGUF:GLM-OCR-Q8_0.gguf
+  #     --mmproj /root/.cache/llama.cpp/ggml-org_GLM-OCR-GGUF_mmproj-GLM-OCR-Q8_0.gguf
+  #     --port 8080
+  #     --host 0.0.0.0
+  #     --ctx-size 16384
+  #     --n-gpu-layers 0
+  #   restart: unless-stopped
+  #   deploy:
+  #     resources:
+  #       limits:
+  #         memory: 4G
