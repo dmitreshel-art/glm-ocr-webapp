@@ -508,9 +508,7 @@
                 const pagesContainer = document.getElementById('pdf-pages');
                 pagesContainer.innerHTML = '';
                 
-                const maxPages = Math.min(pdf.numPages, 5);
-                
-                for (let i = 1; i <= maxPages; i++) {
+                for (let i = 1; i <= pdf.numPages; i++) {
                     const page = await pdf.getPage(i);
                     const viewport = page.getViewport({ scale: 1.2 });
                     const canvas = document.createElement('canvas');
@@ -521,13 +519,6 @@
                     const ctx = canvas.getContext('2d');
                     await page.render({ canvasContext: ctx, viewport }).promise;
                     pagesContainer.appendChild(canvas);
-                }
-                
-                if (pdf.numPages > maxPages) {
-                    const more = document.createElement('div');
-                    more.style.cssText = 'text-align:center;color:#888;padding:8px;';
-                    more.textContent = '+ ещё ' + (pdf.numPages - maxPages) + ' стр.';
-                    pagesContainer.appendChild(more);
                 }
                 
                 previewContainer.style.display = 'none';
