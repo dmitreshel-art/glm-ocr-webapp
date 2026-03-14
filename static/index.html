@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GLM-OCR — Распознавание текста</title>
+    <title>DocReader — Распознавание документов</title>
     <style>
         * {
             margin: 0;
@@ -12,77 +12,111 @@
         }
         
         :root {
-            --bg-primary: #0f0f23;
-            --bg-secondary: #1a1a2e;
-            --bg-tertiary: #16213e;
-            --accent: #00d4ff;
-            --accent-dim: #0099cc;
-            --success: #00ff88;
-            --error: #ff4757;
-            --text-primary: #ffffff;
-            --text-secondary: #a0a0b0;
-            --border: #2a2a4a;
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --success: #059669;
+            --error: #dc2626;
+            --bg-main: #f8fafc;
+            --bg-card: #ffffff;
+            --bg-hover: #f1f5f9;
+            --border: #e2e8f0;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --text-muted: #94a3b8;
+            --shadow: 0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06);
+            --shadow-lg: 0 4px 6px rgba(0,0,0,0.1), 0 2px 4px rgba(0,0,0,0.06);
         }
         
         body {
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-            background: var(--bg-primary);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-main);
             color: var(--text-primary);
             min-height: 100vh;
-            display: flex;
-            flex-direction: column;
         }
         
         .container {
             max-width: 1400px;
-            width: 100%;
             margin: 0 auto;
-            padding: 1rem;
+            padding: 1.5rem;
+            min-height: 100vh;
             display: flex;
             flex-direction: column;
-            height: 100vh;
         }
         
         header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 0.5rem 0;
-            margin-bottom: 1rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 1.5rem;
         }
         
-        h1 {
-            font-size: 1.5rem;
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--primary), #4f46e5);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.25rem;
+        }
+        
+        .logo-text {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .logo-title {
+            font-size: 1.25rem;
             font-weight: 700;
-            background: linear-gradient(135deg, var(--accent), var(--success));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            color: var(--text-primary);
+        }
+        
+        .logo-subtitle {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            font-weight: 400;
         }
         
         .status-indicator {
             display: flex;
             align-items: center;
             gap: 0.5rem;
-            font-size: 0.85rem;
-            color: var(--text-secondary);
+            padding: 0.5rem 1rem;
+            background: var(--bg-card);
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            font-size: 0.875rem;
         }
         
         .status-dot {
             width: 8px;
             height: 8px;
             border-radius: 50%;
-            background: var(--text-secondary);
+            background: var(--text-muted);
         }
         
         .status-dot.ready {
             background: var(--success);
-            box-shadow: 0 0 8px var(--success);
+            box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.2);
         }
         
         .status-dot.error {
             background: var(--error);
-            box-shadow: 0 0 8px var(--error);
+        }
+        
+        .status-text {
+            color: var(--text-secondary);
+            font-weight: 500;
         }
         
         .main-grid {
@@ -94,70 +128,85 @@
         }
         
         .panel {
-            background: var(--bg-secondary);
+            background: var(--bg-card);
             border: 1px solid var(--border);
             border-radius: 12px;
             display: flex;
             flex-direction: column;
-            overflow: hidden;
+            box-shadow: var(--shadow);
         }
         
         .panel-header {
-            padding: 0.75rem 1rem;
+            padding: 1rem 1.25rem;
             border-bottom: 1px solid var(--border);
             font-weight: 600;
-            color: var(--text-secondary);
+            color: var(--text-primary);
             font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .panel-header-icon {
+            color: var(--primary);
         }
         
         .panel-content {
             flex: 1;
-            padding: 1rem;
+            padding: 1.25rem;
             display: flex;
             flex-direction: column;
             min-height: 0;
         }
         
-        /* Upload Panel */
         .upload-zone {
             border: 2px dashed var(--border);
-            border-radius: 8px;
-            padding: 2rem;
+            border-radius: 12px;
+            padding: 2.5rem 2rem;
             text-align: center;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.2s ease;
             flex: 1;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            min-height: 200px;
+            min-height: 250px;
+            background: var(--bg-main);
         }
         
-        .upload-zone:hover, .upload-zone.dragover {
-            border-color: var(--accent);
-            background: rgba(0, 212, 255, 0.05);
+        .upload-zone:hover {
+            border-color: var(--primary);
+            background: rgba(37, 99, 235, 0.04);
         }
         
-        .upload-zone.has-image {
-            display: none;
+        .upload-zone.dragover {
+            border-color: var(--primary);
+            background: rgba(37, 99, 235, 0.08);
         }
         
         .upload-icon {
             font-size: 2.5rem;
+            margin-bottom: 1rem;
+            opacity: 0.6;
+        }
+        
+        .upload-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-primary);
             margin-bottom: 0.5rem;
         }
         
-        .upload-text {
+        .upload-hint {
+            font-size: 0.875rem;
             color: var(--text-secondary);
-            font-size: 0.95rem;
         }
         
-        .upload-hint {
-            color: var(--text-secondary);
-            font-size: 0.8rem;
-            margin-top: 0.5rem;
-            opacity: 0.7;
+        .upload-formats {
+            margin-top: 0.75rem;
+            font-size: 0.75rem;
+            color: var(--text-muted);
         }
         
         #file-input {
@@ -170,41 +219,76 @@
             min-height: 0;
         }
         
-        #preview-container.show {
-            display: flex;
-            flex-direction: column;
-        }
-        
         #preview-image {
             max-width: 100%;
-            max-height: 100%;
+            max-height: 400px;
             object-fit: contain;
             border-radius: 8px;
+            margin: auto;
+        }
+        
+        #pdf-container {
+            display: none;
             flex: 1;
+            overflow-y: auto;
+            min-height: 0;
+        }
+        
+        .pdf-info {
+            padding: 0.75rem 1rem;
+            background: var(--bg-main);
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .pdf-info-icon {
+            color: var(--primary);
+        }
+        
+        .pdf-pages {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+        
+        .pdf-page {
+            width: 100%;
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            background: white;
         }
         
         .btn-row {
             display: flex;
-            gap: 0.5rem;
-            margin-top: 0.75rem;
+            gap: 0.75rem;
+            margin-top: 1rem;
         }
         
         .btn {
-            background: linear-gradient(135deg, var(--accent), var(--accent-dim));
-            color: var(--text-primary);
+            background: var(--primary);
+            color: white;
             border: none;
-            padding: 0.6rem 1.5rem;
-            border-radius: 6px;
-            font-size: 0.9rem;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-size: 0.875rem;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            justify-content: center;
             flex: 1;
         }
         
-        .btn:hover {
+        .btn:hover:not(:disabled) {
+            background: var(--primary-hover);
             transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(0, 212, 255, 0.3);
         }
         
         .btn:disabled {
@@ -214,30 +298,38 @@
         }
         
         .btn-secondary {
-            background: transparent;
+            background: var(--bg-main);
+            color: var(--text-primary);
             border: 1px solid var(--border);
-            color: var(--text-secondary);
         }
         
-        .btn-secondary:hover {
-            border-color: var(--accent);
-            color: var(--accent);
-            background: none;
+        .btn-secondary:hover:not(:disabled) {
+            background: var(--bg-hover);
+            border-color: var(--text-secondary);
         }
         
-        /* Result Panel */
+        .btn-success {
+            background: #059669;
+        }
+        
+        .btn-success:hover:not(:disabled) {
+            background: #047857;
+        }
+        
         #result-text {
-            background: var(--bg-tertiary);
+            background: var(--bg-main);
+            border: 1px solid var(--border);
             border-radius: 8px;
             padding: 1rem;
-            font-family: 'Consolas', 'Monaco', monospace;
-            font-size: 0.9rem;
-            line-height: 1.5;
+            font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+            font-size: 0.875rem;
+            line-height: 1.6;
             white-space: pre-wrap;
             word-wrap: break-word;
             flex: 1;
             overflow-y: auto;
             color: var(--text-primary);
+            min-height: 200px;
         }
         
         #result-text::-webkit-scrollbar {
@@ -245,7 +337,7 @@
         }
         
         #result-text::-webkit-scrollbar-track {
-            background: var(--bg-secondary);
+            background: transparent;
         }
         
         #result-text::-webkit-scrollbar-thumb {
@@ -255,7 +347,7 @@
         
         .progress {
             display: none;
-            margin-top: 0.75rem;
+            margin-top: 1rem;
         }
         
         .progress.show {
@@ -263,15 +355,15 @@
         }
         
         .progress-bar {
-            height: 3px;
-            background: var(--bg-tertiary);
+            height: 4px;
+            background: var(--bg-main);
             border-radius: 2px;
             overflow: hidden;
         }
         
         .progress-fill {
             height: 100%;
-            background: linear-gradient(90deg, var(--accent), var(--success));
+            background: linear-gradient(90deg, var(--primary), #4f46e5);
             width: 0%;
             animation: progress 2s ease-in-out infinite;
         }
@@ -283,33 +375,44 @@
         }
         
         .error-box {
-            background: rgba(255, 71, 87, 0.1);
-            border: 1px solid var(--error);
-            border-radius: 6px;
-            padding: 0.75rem;
+            background: rgba(220, 38, 38, 0.08);
+            border: 1px solid rgba(220, 38, 38, 0.3);
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
             color: var(--error);
-            font-size: 0.9rem;
+            font-size: 0.875rem;
             display: none;
-            margin-top: 0.75rem;
+            margin-top: 1rem;
         }
         
         .error-box.show {
-            display: block;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .error-icon {
+            font-size: 1rem;
         }
         
         footer {
+            padding: 1rem;
             text-align: center;
-            padding: 0.5rem;
-            color: var(--text-secondary);
+            color: var(--text-muted);
             font-size: 0.75rem;
+            margin-top: 1.5rem;
         }
         
         footer a {
-            color: var(--accent);
+            color: var(--primary);
             text-decoration: none;
+            font-weight: 500;
         }
         
-        /* Responsive */
+        footer a:hover {
+            text-decoration: underline;
+        }
+        
         @media (max-width: 900px) {
             .main-grid {
                 grid-template-columns: 1fr;
@@ -324,66 +427,85 @@
             .container {
                 max-width: 1600px;
             }
-            
-            h1 {
-                font-size: 1.75rem;
-            }
-            
-            #result-text {
-                font-size: 0.95rem;
-            }
         }
     </style>
 </head>
 <body>
     <div class="container">
         <header>
-            <h1>🧠 GLM-OCR</h1>
+            <div class="logo">
+                <div class="logo-icon">📄</div>
+                <div class="logo-text">
+                    <div class="logo-title">DocReader</div>
+                    <div class="logo-subtitle">Распознавание документов</div>
+                </div>
+            </div>
             <div class="status-indicator">
                 <span class="status-dot" id="status-dot"></span>
-                <span id="status-text">Проверка сервера...</span>
+                <span class="status-text" id="status-text">Проверка...</span>
             </div>
         </header>
         
         <div class="main-grid">
             <div class="panel">
-                <div class="panel-header">📷 Изображение</div>
+                <div class="panel-header">
+                    <span class="panel-header-icon">📎</span>
+                    Документ
+                </div>
                 <div class="panel-content">
                     <div class="upload-zone" id="upload-zone">
                         <div class="upload-icon">📄</div>
-                        <div class="upload-text">Перетащите или нажмите для выбора</div>
-                        <div class="upload-hint">PNG, JPG, WebP, GIF, PDF • до 50MB</div>
+                        <div class="upload-title">Перетащите или выберите файл</div>
+                        <div class="upload-hint">Изображение или PDF-документ</div>
+                        <div class="upload-formats">PNG, JPG, WebP, GIF, PDF • до 50 МБ</div>
                         <input type="file" id="file-input" accept="image/*,.pdf,application/pdf">
                     </div>
-                    <div id="preview-container" style="display:none;">
+                    <div id="preview-container">
                         <img id="preview-image" alt="Предпросмотр">
                     </div>
                     <div id="pdf-container" style="display:none;flex:1;overflow-y:auto;">
-                        <div class="pdf-info" id="pdf-info" style="padding:8px;background:rgba(0,0,0,0.1);border-radius:8px;margin-bottom:8px;font-size:14px;"></div>
+                        <div class="pdf-info" id="pdf-info">
+                            <span class="pdf-info-icon">📄</span>
+                            <span id="pdf-filename"></span>
+                        </div>
                         <div class="pdf-pages" id="pdf-pages"></div>
                     </div>
                     <div class="btn-row">
-                        <button class="btn" id="process-btn" disabled>🔍 Распознать</button>
-                        <button class="btn btn-secondary" id="clear-btn" style="display:none">✕ Очистить</button>
+                        <button class="btn" id="process-btn" disabled>
+                            <span>🔍</span> Распознать
+                        </button>
+                        <button class="btn btn-secondary" id="clear-btn" style="display:none">
+                            <span>✕</span> Очистить
+                        </button>
                     </div>
                     <div class="progress" id="progress">
                         <div class="progress-bar">
                             <div class="progress-fill"></div>
                         </div>
                     </div>
-                    <div class="error-box" id="error-box"></div>
+                    <div class="error-box" id="error-box">
+                        <span class="error-icon">⚠️</span>
+                        <span id="error-text"></span>
+                    </div>
                 </div>
             </div>
             
             <div class="panel">
-                <div class="panel-header">📝 Результат</div>
+                <div class="panel-header">
+                    <span class="panel-header-icon">📝</span>
+                    Результат
+                </div>
                 <div class="panel-content">
-                    <div id="result-text" style="color: var(--text-secondary); font-style: italic;">
-                        Загрузите изображение для распознавания текста
+                    <div id="result-text" style="color: var(--text-muted); font-style: italic;">
+                        Загрузите документ для распознавания текста
                     </div>
                     <div class="btn-row">
-                        <button class="btn btn-secondary" id="copy-btn" disabled>📋 Копировать</button>
-                        <button class="btn btn-secondary" id="download-btn" disabled>💾 Скачать</button>
+                        <button class="btn btn-secondary" id="copy-btn" disabled>
+                            <span>📋</span> Копировать
+                        </button>
+                        <button class="btn btn-success btn-secondary" id="download-btn" disabled>
+                            <span>💾</span> Скачать TXT
+                        </button>
                     </div>
                 </div>
             </div>
@@ -486,7 +608,6 @@
                 copyBtn.disabled = true;
                 downloadBtn.disabled = true;
             };
-            reader.readAsDataURL(file);
         }
         
         async function renderPdfPreview(file) {
@@ -573,8 +694,6 @@
                 const data = await res.json();
                 
                 if (data.success) {
-                    resultText.style.color = 'var(--text-primary)';
-                    resultText.style.fontStyle = 'normal';
                     resultText.textContent = data.text || 'Текст не распознан';
                     copyBtn.disabled = false;
                     downloadBtn.disabled = false;
