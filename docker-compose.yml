@@ -1,26 +1,39 @@
 version: '3.8'
 
 services:
-  glm-ocr:
-    build: .
-    image: glm-ocr-webapp:latest
+  # Pre-built llama.cpp server with GLM-OCR model
+  llama-server:
+    image: ghcr.io/ggml-org/llama.cpp:server
+    container_name: glm-ocr-llama
+    ports:
+      - "8765:8080"
+    volumes:
+      - hf-cache:/root/.cache/llama.cpp
+    command: >
+      -hf ggml-org/GLM-OCR-GGUF:mmproj-GLM-OCR-Q8_0.gguf,GLM-OCR-Q8_0.gguf
+      --port 8080
+      --host 0.0.0.0
+      --ctx-size 4096
+      --n-gpu-layers 0
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 4G
+
+  # Python web backend
+  webapp:
+    build: 
+      context: .
+      dockerfile: Dockerfile.web
     container_name: glm-ocr-web
     ports:
       - "8080:8080"
     environment:
-      - HF_REPO=ggml-org/GLM-OCR-GGUF:Q8_0
-      - LLAMA_SERVER_PORT=8765
-      - TZ=UTC
-    volumes:
-      - hf-cache:/root/.cache/llama.cpp
+      - LLAMA_SERVER_URL=http://llama-server:8080
+    depends_on:
+      - llama-server
     restart: unless-stopped
-    deploy:
-      resources:
-        reservations:
-          memory: 2G
-        limits:
-          memory: 4G
 
 volumes:
   hf-cache:
-    driver: local
