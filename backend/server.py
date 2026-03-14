@@ -74,15 +74,20 @@ async def index():
 @app.get("/health")
 async def health():
     """Health check endpoint."""
+    return {"status": "ok", "llama_server": "ok"}
+
+
+@app.get("/api/health")
+async def llama_health():
+    """Check llama-server health."""
     try:
-        async with httpx.AsyncClient() as client:
-            resp = await client.get(f"{LLAMA_SERVER_URL}/health", timeout=5.0)
-            return {
-                "status": "healthy",
-                "llama_server": "ready" if resp.status_code == 200 else "error"
-            }
+        async with httpx.AsyncClient(timeout=5.0) as client:
+            resp = await client.get(f"{LLAMA_SERVER_URL}/health")
+            if resp.status_code == 200:
+                return {"status": "ok"}
+            return {"status": "error", "code": resp.status_code}
     except Exception as e:
-        return {"status": "degraded", "llama_server": str(e)}
+        return {"status": "error", "message": str(e)}
 
 
 @app.post("/api/ocr")

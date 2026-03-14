@@ -405,16 +405,35 @@
         // Health check
         async function checkHealth() {
             try {
-                const res = await fetch('/health');
-                const data = await res.json();
-                if (data.server_ready) {
-                    statusDot.classList.add('ready');
-                    statusDot.classList.remove('error');
-                    statusText.textContent = `Сервер готов (${data.model})`;
-                } else {
-                    statusDot.classList.remove('ready');
-                    statusText.textContent = 'Сервер запускается...';
-                    setTimeout(checkHealth, 2000);
+                // First check webapp
+                const webappRes = await fetch('/health');
+                const webappData = await webappRes.json();
+                
+                // Then check llama-server directly
+                try {
+                    const llamaRes = await fetch('/api/health');
+                    const llamaData = await llamaRes.json();
+                    
+                    if (llamaData.status === 'ok' || llamaRes.ok) {
+                        statusDot.classList.add('ready');
+                        statusDot.classList.remove('error');
+                        statusText.textContent = 'Сервер готов';
+                    } else {
+                        statusDot.classList.remove('ready');
+                        statusText.textContent = 'Сервер запускается...';
+                        setTimeout(checkHealth, 2000);
+                    }
+                } catch {
+                    // Try to ping llama-server through webapp health
+                    if (webappData.llama_server === 'ready' || webappData.llama_server === 'ok') {
+                        statusDot.classList.add('ready');
+                        statusDot.classList.remove('error');
+                        statusText.textContent = 'Сервер готов';
+                    } else {
+                        statusDot.classList.remove('ready');
+                        statusText.textContent = 'Сервер запускается...';
+                        setTimeout(checkHealth, 2000);
+                    }
                 }
             } catch (e) {
                 statusDot.classList.add('error');
