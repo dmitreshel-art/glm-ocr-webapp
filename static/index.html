@@ -596,7 +596,7 @@
                 previewImage.src = e.target.result;
                 previewContainer.style.display = 'flex';
                 pdfContainer.style.display = 'none';
-                uploadZone.style.display = 'none';
+                uploadZone.classList.add('has-preview');
                 processBtn.disabled = false;
                 clearBtn.style.display = 'block';
                 hideError();
@@ -637,7 +637,7 @@
                 }
                 previewContainer.style.display = 'none';
                 pdfContainer.style.display = 'flex';
-                uploadZone.style.display = 'none';
+                uploadZone.classList.add('has-preview');
                 processBtn.disabled = false;
                 clearBtn.style.display = 'block';
                 hideError();
@@ -654,7 +654,7 @@
             selectedFile = null;
             previewContainer.style.display = 'none';
             pdfContainer.style.display = 'none';
-            uploadZone.style.display = 'flex';
+            uploadZone.classList.remove('has-preview');
             processBtn.disabled = true;
             clearBtn.style.display = 'none';
             resultText.textContent = 'Загрузите изображение или PDF';
