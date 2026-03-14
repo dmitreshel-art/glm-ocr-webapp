@@ -1,8 +1,8 @@
 version: '3.8'
 
 services:
-  # ROCm-enabled llama.cpp server for AMD GPUs
-  # Uncomment devices and environment to enable GPU acceleration
+  # llama.cpp server - reads config from ./config.yaml
+  # Edit config.yaml to switch between Q8_0 and F16
   llama-server:
     image: ghcr.io/ggml-org/llama.cpp:server
     container_name: glm-ocr-llama
@@ -10,8 +10,12 @@ services:
       - "8765:8080"
     volumes:
       - ./hf-cache:/root/.cache/llama.cpp
+      - ./config.yaml:/app/config.yaml:ro
+    environment:
+      - MODEL_VARIANT=${MODEL_VARIANT:-Q8_0}
     command: >
-      -hf ggml-org/GLM-OCR-GGUF
+      -hf ggml-org/GLM-OCR-GGUF:GLM-OCR-${MODEL_VARIANT:-Q8_0}.gguf
+      --mmproj /root/.cache/llama.cpp/mmproj-GLM-OCR-${MODEL_VARIANT:-Q8_0}.gguf
       --port 8080
       --host 0.0.0.0
       --ctx-size 16384
