@@ -15,7 +15,7 @@ services:
       - MODEL_VARIANT=${MODEL_VARIANT:-Q8_0}
     command: >
       -hf mradermacher/GLM-OCR-GGUF:GLM-OCR.Q8_0.gguf
-      -hf mradermacher/GLM-OCR-GGUF:GLM-OCR.mmproj-Q8_0.gguf
+      --mmproj /root/.cache/llama.cpp/GLM-OCR.mmproj-Q8_0.gguf
       --port 8080
       --host 0.0.0.0
       --ctx-size 16384
