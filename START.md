@@ -5,14 +5,24 @@
 ### Option 1: HIP GPU Acceleration (Recommended - ~10x faster)
 
 ```powershell
-# Start HIP llama-server (GPU)
+# Start HIP llama-server (GPU ~2-5 sec/page)
 .\start-hip.ps1
 
 # In another terminal, start WebApp
 .\update.cmd
 ```
 
-### Option 2: Docker CPU Mode (Slower but simpler)
+### Option 2: CPU on Windows Host (Slower, no Docker)
+
+```powershell
+# Start llama-server on Windows (CPU-only, ~50 sec/page)
+.\start-cpu-local.ps1
+
+# In another terminal, start WebApp
+.\update.cmd
+```
+
+### Option 3: Docker CPU Mode (Slowest, simplest)
 
 ```powershell
 # Start both in Docker (CPU-only)
@@ -21,31 +31,25 @@
 
 ---
 
-## Detailed Commands
+## Startup Scripts
 
-### HIP GPU Mode (Radeon 890M)
+| Script | Mode | Speed | Location |
+|--------|------|-------|----------|
+| `start-hip.ps1` | GPU | ~2-5 sec/page | Windows host |
+| `start-cpu-local.ps1` | CPU | ~50 sec/page | Windows host |
+| `update.cmd cpu` | CPU | ~50 sec/page | Docker |
 
-```powershell
-# Start HIP llama-server (port 8765, GPU)
-.\start-hip.ps1
+---
 
-# Start WebApp (port 8080, connects to HIP)
-.\update.cmd
-```
+## update.cmd Commands
 
-### Docker CPU Mode
-
-```powershell
-# Start both llama-server and WebApp in Docker
-.\update.cmd cpu
-```
-
-### Stopping
-
-```powershell
-# Stop all instances
-.\stop.ps1
-```
+| Command | Description |
+|---------|-------------|
+| `update.cmd` | Start WebApp (HIP/CPU host mode) |
+| `update.cmd cpu` | Start both in Docker (CPU mode) |
+| `update.cmd down` | Stop WebApp |
+| `update.cmd logs` | View logs |
+| `update.cmd status` | Container status |
 
 ---
 
@@ -61,7 +65,16 @@ Option 1 (HIP GPU):
 │          → http://host.docker.internal:8765  │
 └─────────────────────────────────────────────┘
 
-Option 2 (Docker CPU):
+Option 2 (CPU on Windows):
+┌─────────────────────────────────────────────┐
+│  Windows Host                                │
+│  ├── llama-server.exe :8765 (CPU)           │
+│  └── Docker Desktop                          │
+│      └── WebApp :8080                         │
+│          → http://host.docker.internal:8765  │
+└─────────────────────────────────────────────┘
+
+Option 3 (Docker CPU):
 ┌─────────────────────────────────────────────┐
 │  Docker Desktop                              │
 │  ├── llama-server :8765 (CPU)               │
@@ -72,19 +85,7 @@ Option 2 (Docker CPU):
 
 ---
 
-## update.cmd Commands
-
-| Command | Description |
-|---------|-------------|
-| `update.cmd` | Start WebApp (HIP mode) |
-| `update.cmd cpu` | Start both in Docker (CPU mode) |
-| `update.cmd down` | Stop WebApp |
-| `update.cmd logs` | View logs |
-| `update.cmd status` | Container status |
-
----
-
 ## Ports
 
 - 8080: WebApp (always)
-- 8765: llama-server (HIP or Docker, not both)
+- 8765: llama-server (HIP, CPU local, or Docker - choose one)
