@@ -1,32 +1,32 @@
 version: '3.8'
 
 services:
-  # llama.cpp server (CPU-only, optional)
-  # Use this OR run HIP llama-server.exe on Windows (not both)
-  # To enable: uncomment the service below and comment out HIP in start script
-  # llama-server:
-  #   image: ghcr.io/ggml-org/llama.cpp:server
-  #   container_name: glm-ocr-llama
-  #   ports:
-  #     - "8765:8080"
-  #   volumes:
-  #     - ./hf-cache:/root/.cache/llama.cpp
-  #   command: >
-  #     -hf ggml-org/GLM-OCR-GGUF:GLM-OCR-Q8_0.gguf
-  #     --mmproj /root/.cache/llama.cpp/ggml-org_GLM-OCR-GGUF_mmproj-GLM-OCR-Q8_0.gguf
-  #     --port 8080
-  #     --host 0.0.0.0
-  #     --ctx-size 16384
-  #     --n-gpu-layers 0
-  #   restart: unless-stopped
-  #   deploy:
-  #     resources:
-  #       limits:
-  #         memory: 4G
+  # llama.cpp server (CPU-only)
+  # Use --profile cpu to enable: docker-compose --profile cpu up -d
+  llama-server:
+    image: ghcr.io/ggml-org/llama.cpp:server
+    container_name: glm-ocr-llama
+    profiles:
+      - cpu
+    ports:
+      - "8765:8080"
+    volumes:
+      - ./hf-cache:/root/.cache/llama.cpp
+    command: >
+      -hf ggml-org/GLM-OCR-GGUF:GLM-OCR-Q8_0.gguf
+      --mmproj /root/.cache/llama.cpp/ggml-org_GLM-OCR-GGUF_mmproj-GLM-OCR-Q8_0.gguf
+      --port 8080
+      --host 0.0.0.0
+      --ctx-size 16384
+      --n-gpu-layers 0
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 4G
 
   # Python web backend
   # Connects to llama-server on port 8765
-  # Priority: 1) LLAMA_SERVER_URL env var, 2) host.docker.internal (HIP on Windows), 3) llama-server container
   webapp:
     build: 
       context: .

@@ -3,6 +3,9 @@
 
 Write-Host "Starting Docker llama-server (CPU)..." -ForegroundColor Yellow
 
+# Stop HIP if running
+Get-Process -Name "llama-server" -ErrorAction SilentlyContinue | Stop-Process -Force
+
 # Run with CPU profile
 docker-compose --profile cpu up -d
 

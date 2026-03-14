@@ -1,31 +1,49 @@
 # GLM-OCR WebApp - Startup Scripts for Windows
 
-## Option 1: HIP GPU Acceleration (Recommended)
-
-Run HIP llama-server on Windows with GPU acceleration:
+## Option 1: HIP GPU Acceleration (Recommended - ~10x faster)
 
 ```powershell
-# Start HIP llama-server (GPU)
+# Start HIP llama-server on Windows (GPU)
 .\start-hip.ps1
+
+# In another terminal, start WebApp
+docker-compose up -d
 ```
 
-This starts llama-server.exe on port 8765 using your AMD Radeon GPU.
-
-## Option 2: Docker CPU Mode
-
-Run llama-server in Docker container (CPU-only):
+## Option 2: Docker CPU Mode (Slower but simpler)
 
 ```powershell
-# Start Docker llama-server (CPU)
-docker-compose --profile cpu up -d
+# Start both llama-server and WebApp in Docker
+.\start-cpu.ps1
 ```
 
-## WebApp
+## Architecture
 
-The WebApp automatically connects to the available llama-server:
-- Priority: LLAMA_SERVER_URL env var
-- Fallback: http://host.docker.internal:8765 (HIP on Windows)
-- Alternative: http://llama-server:8080 (Docker container)
+```
+Option 1 (HIP GPU):
+┌─────────────────────────────────────────────┐
+│  Windows Host                                │
+│  ├── HIP llama-server.exe :8765 (GPU)       │
+│  └── Docker Desktop                          │
+│      └── WebApp :8080                         │
+│          → http://host.docker.internal:8765  │
+└─────────────────────────────────────────────┘
+
+Option 2 (Docker CPU):
+┌─────────────────────────────────────────────┐
+│  Docker Desktop                              │
+│  ├── llama-server :8765 (CPU)               │
+│  └── WebApp :8080                            │
+│      → http://llama-server:8080              │
+└─────────────────────────────────────────────┘
+```
+
+## Stopping
+
+```powershell
+# Stop all instances
+.\stop.ps1
+```
 
 ## Ports
 
