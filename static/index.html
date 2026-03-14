@@ -154,50 +154,40 @@
         
         .panel-content {
             flex: 1;
-            padding: 1.25rem;
+            padding: 1rem;
             display: flex;
             flex-direction: column;
             min-height: 0;
-            position: relative;
         }
         
         .upload-zone {
             border: 2px dashed var(--border);
-            border-radius: 12px;
+            border-radius: 8px;
             padding: 2rem;
             text-align: center;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: all 0.3s ease;
             flex: 1;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
+            min-height: 200px;
             background: var(--bg-main);
         }
         
-        .upload-zone:hover {
+        .upload-zone:hover, .upload-zone.dragover {
             border-color: var(--primary);
-            background: rgba(37, 99, 235, 0.04);
-        }
-        
-        .upload-zone.dragover {
-            border-color: var(--primary);
-            background: rgba(37, 99, 235, 0.08);
+            background: rgba(37, 99, 235, 0.05);
         }
         
         .upload-zone.hidden {
-            position: absolute;
-            top: 1.25rem;
-            left: 1.25rem;
-            right: 1.25rem;
-            bottom: auto;
+            display: none;
         }
         
         .upload-icon {
             font-size: 2.5rem;
-            margin-bottom: 1rem;
-            opacity: 0.6;
+            margin-bottom: 0.5rem;
         }
         
         .upload-title {
@@ -208,12 +198,12 @@
         }
         
         .upload-hint {
-            font-size: 0.875rem;
             color: var(--text-secondary);
+            font-size: 0.875rem;
         }
         
         .upload-formats {
-            margin-top: 0.75rem;
+            margin-top: 0.5rem;
             font-size: 0.75rem;
             color: var(--text-muted);
         }
@@ -225,14 +215,14 @@
         #preview-container {
             display: none;
             flex: 1;
-            min-height: 200px;
+            min-height: 0;
             overflow: hidden;
-            justify-content: center;
-            align-items: center;
         }
         
         #preview-container.visible {
             display: flex;
+            align-items: center;
+            justify-content: center;
         }
         
         #preview-image {
@@ -240,19 +230,39 @@
             max-height: 100%;
             object-fit: contain;
             border-radius: 8px;
-            border: 1px solid var(--border);
         }
         
         #pdf-container {
             display: none;
             flex: 1;
-            min-height: 200px;
+            min-height: 0;
             overflow-y: auto;
         }
         
         #pdf-container.visible {
             display: flex;
             flex-direction: column;
+        }
+        
+        .pdf-info {
+            padding: 0.5rem 0.75rem;
+            background: var(--bg-main);
+            border-radius: 6px;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .pdf-pages {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .pdf-page {
+            width: 100%;
+            border-radius: 6px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
         
         .pdf-info {
