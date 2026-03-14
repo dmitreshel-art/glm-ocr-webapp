@@ -358,6 +358,10 @@
                     <div id="preview-container">
                         <img id="preview-image" alt="Предпросмотр">
                     </div>
+                    <div id="pdf-container" style="display:none;">
+                        <div class="pdf-info" id="pdf-info"></div>
+                        <div class="pdf-pages" id="pdf-pages"></div>
+                    </div>
                     <div class="btn-row">
                         <button class="btn" id="process-btn" disabled>🔍 Распознать</button>
                         <button class="btn btn-secondary" id="clear-btn" style="display:none">✕ Очистить</button>
@@ -393,6 +397,7 @@
         const uploadZone = document.getElementById('upload-zone');
         const fileInput = document.getElementById('file-input');
         const previewContainer = document.getElementById('preview-container');
+        const pdfContainer = document.getElementById('pdf-container');
         const previewImage = document.getElementById('preview-image');
         const processBtn = document.getElementById('process-btn');
         const clearBtn = document.getElementById('clear-btn');
