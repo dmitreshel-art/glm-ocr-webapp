@@ -403,41 +403,44 @@
         let selectedFile = null;
         
         // Health check
+        let startupAttempts = 0;
+        
         async function checkHealth() {
             try {
-                // First check webapp
-                const webappRes = await fetch('/health');
-                const webappData = await webappRes.json();
+                // Check llama-server through webapp proxy
+                const res = await fetch('/api/health');
+                const data = await res.json();
                 
-                // Then check llama-server directly
-                try {
-                    const llamaRes = await fetch('/api/health');
-                    const llamaData = await llamaRes.json();
+                if (data.status === 'ok') {
+                    statusDot.classList.add('ready');
+                    statusDot.classList.remove('error');
+                    statusText.textContent = 'Сервер готов';
+                } else {
+                    startupAttempts++;
+                    statusDot.classList.remove('ready');
                     
-                    if (llamaData.status === 'ok' || llamaRes.ok) {
-                        statusDot.classList.add('ready');
-                        statusDot.classList.remove('error');
-                        statusText.textContent = 'Сервер готов';
+                    if (startupAttempts > 10) {
+                        statusText.textContent = 'Скачивание модели (первый запуск)...';
                     } else {
-                        statusDot.classList.remove('ready');
                         statusText.textContent = 'Сервер запускается...';
-                        setTimeout(checkHealth, 2000);
                     }
-                } catch {
-                    // Try to ping llama-server through webapp health
-                    if (webappData.llama_server === 'ready' || webappData.llama_server === 'ok') {
-                        statusDot.classList.add('ready');
-                        statusDot.classList.remove('error');
-                        statusText.textContent = 'Сервер готов';
-                    } else {
-                        statusDot.classList.remove('ready');
-                        statusText.textContent = 'Сервер запускается...';
-                        setTimeout(checkHealth, 2000);
-                    }
+                    
+                    setTimeout(checkHealth, 2000);
                 }
             } catch (e) {
-                statusDot.classList.add('error');
-                statusText.textContent = 'Ошибка подключения к серверу';
+                startupAttempts++;
+                statusDot.classList.remove('ready');
+                
+                if (startupAttempts > 5) {
+                    // First run - downloading model
+                    statusText.textContent = 'Скачивание модели (~1 GB)...';
+                    statusDot.classList.remove('error');
+                } else {
+                    statusDot.classList.add('error');
+                    statusText.textContent = 'Сервер запускается...';
+                }
+                
+                setTimeout(checkHealth, 2000);
             }
         }
         
