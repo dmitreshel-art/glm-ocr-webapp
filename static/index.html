@@ -358,8 +358,8 @@
                     <div id="preview-container" style="display:none;">
                         <img id="preview-image" alt="Предпросмотр">
                     </div>
-                    <div id="pdf-container" class="card-content" style="display:none;">
-                        <div class="pdf-info" id="pdf-info"></div>
+                    <div id="pdf-container" style="display:none;flex:1;overflow-y:auto;">
+                        <div class="pdf-info" id="pdf-info" style="padding:8px;background:rgba(0,0,0,0.1);border-radius:8px;margin-bottom:8px;font-size:14px;"></div>
                         <div class="pdf-pages" id="pdf-pages"></div>
                     </div>
                     <div class="btn-row">
@@ -457,38 +457,105 @@
                 showError('Выберите изображение или PDF');
                 return;
             }
-            if (file.size > 20 * 1024 * 1024) {
-                showError('Файл слишком большой (макс. 20MB)');
+            if (file.size > 50 * 1024 * 1024) {
+                showError('Файл слишком большой (макс. 50MB)');
                 return;
             }
             
             selectedFile = file;
+            
+            // PDF handling with pdf.js preview
+            if (file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf')) {
+                renderPdfPreview(file);
+                return;
+            }
+            
+            // Image preview
             const reader = new FileReader();
             reader.onload = e => {
                 previewImage.src = e.target.result;
-                previewContainer.classList.add('show');
+                previewContainer.style.display = 'flex';
+                pdfContainer.style.display = 'none';
                 uploadZone.style.display = 'none';
                 processBtn.disabled = false;
                 clearBtn.style.display = 'block';
                 hideError();
-                resultText.style.color = 'var(--text-secondary)';
-                resultText.style.fontStyle = 'italic';
-                resultText.textContent = 'Нажмите "Распознать" для обработки';
+                resultText.textContent = 'Нажмите "Распознать"';
                 copyBtn.disabled = true;
             };
             reader.readAsDataURL(file);
         }
         
+        async function renderPdfPreview(file) {
+            try {
+                // Load pdf.js from CDN if needed
+                if (typeof pdfjsLib === 'undefined') {
+                    const script = document.createElement('script');
+                    script.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
+                    document.head.appendChild(script);
+                    await new Promise((resolve, reject) => {
+                        script.onload = resolve;
+                        script.onerror = () => reject(new Error('Failed to load pdf.js'));
+                    });
+                    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+                }
+                
+                const arrayBuffer = await file.arrayBuffer();
+                const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+                
+                document.getElementById('pdf-info').textContent = file.name + ' — ' + pdf.numPages + ' стр.';
+                
+                const pagesContainer = document.getElementById('pdf-pages');
+                pagesContainer.innerHTML = '';
+                
+                const maxPages = Math.min(pdf.numPages, 5);
+                
+                for (let i = 1; i <= maxPages; i++) {
+                    const page = await pdf.getPage(i);
+                    const viewport = page.getViewport({ scale: 1.2 });
+                    const canvas = document.createElement('canvas');
+                    canvas.className = 'pdf-page';
+                    canvas.width = viewport.width;
+                    canvas.height = viewport.height;
+                    canvas.style.cssText = 'width:100%;border-radius:8px;margin-bottom:8px;background:#fff;';
+                    const ctx = canvas.getContext('2d');
+                    await page.render({ canvasContext: ctx, viewport }).promise;
+                    pagesContainer.appendChild(canvas);
+                }
+                
+                if (pdf.numPages > maxPages) {
+                    const more = document.createElement('div');
+                    more.style.cssText = 'text-align:center;color:#888;padding:8px;';
+                    more.textContent = '+ ещё ' + (pdf.numPages - maxPages) + ' стр.';
+                    pagesContainer.appendChild(more);
+                }
+                
+                previewContainer.style.display = 'none';
+                pdfContainer.style.display = 'flex';
+                pdfContainer.style.flexDirection = 'column';
+                uploadZone.style.display = 'none';
+                processBtn.disabled = false;
+                clearBtn.style.display = 'block';
+                hideError();
+                resultText.textContent = 'PDF: ' + pdf.numPages + ' страниц';
+                copyBtn.disabled = true;
+            } catch (e) {
+                console.error('PDF error:', e);
+                showError('Ошибка PDF: ' + e.message);
+            }
+        }
+        
         clearBtn.addEventListener('click', () => {
             selectedFile = null;
-            previewContainer.classList.remove('show');
+            previewContainer.style.display = 'none';
+            pdfContainer.style.display = 'none';
             uploadZone.style.display = 'flex';
             processBtn.disabled = true;
             clearBtn.style.display = 'none';
-            resultText.style.color = 'var(--text-secondary)';
-            resultText.style.fontStyle = 'italic';
-            resultText.textContent = 'Загрузите изображение для распознавания текста';
+            resultText.textContent = 'Загрузите изображение или PDF';
             copyBtn.disabled = true;
+            document.getElementById('pdf-pages').innerHTML = '';
+            hideError();
         });
         
         processBtn.addEventListener('click', async () => {
