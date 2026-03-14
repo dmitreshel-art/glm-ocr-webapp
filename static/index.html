@@ -447,8 +447,9 @@
         });
         
         function handleFile(file) {
-            if (!file.type.startsWith('image/')) {
-                showError('Выберите файл изображения');
+            const validTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/webp', 'image/gif', 'application/pdf'];
+            if (!validTypes.includes(file.type) && !file.name.toLowerCase().endsWith('.pdf')) {
+                showError('Выберите изображение или PDF');
                 return;
             }
             if (file.size > 20 * 1024 * 1024) {
