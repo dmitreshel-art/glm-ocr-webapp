@@ -383,6 +383,7 @@
                     </div>
                     <div class="btn-row">
                         <button class="btn btn-secondary" id="copy-btn" disabled>📋 Копировать</button>
+                        <button class="btn btn-secondary" id="download-btn" disabled>💾 Скачать</button>
                     </div>
                 </div>
             </div>
@@ -405,6 +406,7 @@
         const resultText = document.getElementById('result-text');
         const errorBox = document.getElementById('error-box');
         const copyBtn = document.getElementById('copy-btn');
+        const downloadBtn = document.getElementById('download-btn');
         const statusDot = document.getElementById('status-dot');
         const statusText = document.getElementById('status-text');
         
@@ -482,6 +484,7 @@
                 hideError();
                 resultText.textContent = 'Нажмите "Распознать"';
                 copyBtn.disabled = true;
+                downloadBtn.disabled = true;
             };
             reader.readAsDataURL(file);
         }
@@ -530,6 +533,7 @@
                 hideError();
                 resultText.textContent = 'PDF: ' + pdf.numPages + ' страниц';
                 copyBtn.disabled = true;
+                downloadBtn.disabled = true;
             } catch (e) {
                 console.error('PDF error:', e);
                 showError('Ошибка PDF: ' + e.message);
@@ -545,6 +549,7 @@
             clearBtn.style.display = 'none';
             resultText.textContent = 'Загрузите изображение или PDF';
             copyBtn.disabled = true;
+            downloadBtn.disabled = true;
             document.getElementById('pdf-pages').innerHTML = '';
             hideError();
         });
@@ -572,6 +577,7 @@
                     resultText.style.fontStyle = 'normal';
                     resultText.textContent = data.text || 'Текст не распознан';
                     copyBtn.disabled = false;
+                    downloadBtn.disabled = false;
                 } else {
                     showError(data.error || 'Ошибка распознавания');
                     resultText.textContent = 'Ошибка';
@@ -584,6 +590,20 @@
                 clearBtn.disabled = false;
                 progress.classList.remove('show');
             }
+        });
+        
+        downloadBtn.addEventListener('click', () => {
+            const text = resultText.textContent;
+            const filename = selectedFile ? selectedFile.name.replace(/\.[^.]+$/, '') + '_ocr.txt' : 'ocr_result.txt';
+            const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            a.click();
+            URL.revokeObjectURL(url);
+            downloadBtn.textContent = '✓ Скачано';
+            setTimeout(() => downloadBtn.textContent = '💾 Скачать', 1500);
         });
         
         copyBtn.addEventListener('click', () => {
