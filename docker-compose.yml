@@ -8,7 +8,7 @@ services:
     ports:
       - "8765:8080"
     volumes:
-      - hf-cache:/root/.cache/llama.cpp
+      - ./hf-cache:/root/.cache/llama.cpp
     command: >
       -hf ggml-org/GLM-OCR-GGUF
       --port 8080
