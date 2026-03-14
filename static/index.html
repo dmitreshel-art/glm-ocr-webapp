@@ -214,7 +214,8 @@
         
         #preview-container {
             display: none;
-            max-height: 300px;
+            flex: 1;
+            min-height: 0;
             overflow: hidden;
         }
         
@@ -226,14 +227,15 @@
         
         #preview-image {
             max-width: 100%;
-            max-height: 300px;
+            max-height: 100%;
             object-fit: contain;
             border-radius: 8px;
         }
         
         #pdf-container {
             display: none;
-            max-height: 300px;
+            flex: 1;
+            min-height: 0;
             overflow-y: auto;
         }
         
