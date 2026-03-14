@@ -88,24 +88,31 @@ async def health():
 @app.post("/api/ocr")
 async def process_ocr(file: UploadFile = File(...)):
     """Process image and return OCR result."""
+    import traceback
+    
     allowed_types = ["image/png", "image/jpeg", "image/jpg", "image/webp", "image/gif"]
     if file.content_type not in allowed_types:
         raise HTTPException(400, f"Invalid file type: {file.content_type}")
     
-    content = await file.read()
-    
-    # Resize image to fit context window
     try:
-        resized_content, mime_type = resize_image(content)
-    except Exception as e:
-        raise HTTPException(400, f"Failed to process image: {str(e)}")
-    
-    image_base64 = base64.b64encode(resized_content).decode("utf-8")
-    image_url = f"data:{mime_type};base64,{image_base64}"
-    
-    prompt = "Recognize all text in this image. Output only the text without any comments."
-    
-    try:
+        content = await file.read()
+        print(f"[OCR] Received image: {len(content)} bytes, type: {file.content_type}")
+        
+        # Resize image to fit context window
+        try:
+            resized_content, mime_type = resize_image(content)
+            print(f"[OCR] Resized image: {len(resized_content)} bytes, type: {mime_type}")
+        except Exception as e:
+            print(f"[OCR] Resize failed: {e}")
+            raise HTTPException(400, f"Failed to process image: {str(e)}")
+        
+        image_base64 = base64.b64encode(resized_content).decode("utf-8")
+        image_url = f"data:{mime_type};base64,{image_base64}"
+        
+        prompt = "Recognize all text in this image. Output only the text without any comments."
+        
+        print(f"[OCR] Sending to llama-server...")
+        
         async with httpx.AsyncClient(timeout=120.0) as client:
             response = await client.post(
                 f"{LLAMA_SERVER_URL}/v1/chat/completions",
@@ -123,28 +130,41 @@ async def process_ocr(file: UploadFile = File(...)):
                 }
             )
             
+            print(f"[OCR] Response status: {response.status_code}")
+            
             if response.status_code != 200:
-                raise HTTPException(500, f"OCR failed: {response.text}")
+                print(f"[OCR] Error response: {response.text[:500]}")
+                raise HTTPException(500, f"OCR failed: {response.text[:200]}")
             
             result = response.json()
             text = result.get("choices", [{}])[0].get("message", {}).get("content", "")
+            print(f"[OCR] Got text: {len(text)} chars")
             
             # Save result to file
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
             safe_filename = "".join(c if c.isalnum() or c in "._- " else "_" for c in (file.filename or "image"))
             result_file = RESULTS_DIR / f"{timestamp}_{safe_filename}.txt"
             
-            async with aiofiles.open(result_file, "w", encoding="utf-8") as f:
-                await f.write(f"# OCR Result\n")
-                await f.write(f"# Source: {file.filename}\n")
-                await f.write(f"# Date: {datetime.now().isoformat()}\n\n")
-                await f.write(text.strip())
+            try:
+                async with aiofiles.open(result_file, "w", encoding="utf-8") as f:
+                    await f.write(f"# OCR Result\n")
+                    await f.write(f"# Source: {file.filename}\n")
+                    await f.write(f"# Date: {datetime.now().isoformat()}\n\n")
+                    await f.write(text.strip())
+                print(f"[OCR] Saved to: {result_file}")
+            except Exception as e:
+                print(f"[OCR] Failed to save result: {e}")
             
-            return {"success": True, "text": text.strip(), "file_id": file_id}
+            return {"success": True, "text": text.strip(), "file_id": timestamp}
             
     except httpx.TimeoutException:
+        print(f"[OCR] Timeout")
         raise HTTPException(504, "OCR request timed out")
+    except HTTPException:
+        raise
     except Exception as e:
+        print(f"[OCR] Error: {e}")
+        traceback.print_exc()
         raise HTTPException(500, f"OCR error: {str(e)}")
 
 
