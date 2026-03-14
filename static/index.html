@@ -185,6 +185,9 @@
             padding: 20px;
             display: flex;
             flex-direction: column;
+            min-height: 0;
+            max-height: 100%;
+            overflow: hidden;
         }
         
         /* Upload Zone */
@@ -194,7 +197,8 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            min-height: 200px;
+            min-height: 0;
+            max-height: 300px;
             border: 2px dashed var(--border);
             border-radius: 12px;
             cursor: pointer;
@@ -241,6 +245,7 @@
             display: none;
             flex: 1;
             min-height: 0;
+            max-height: 300px;
         }
         
         #preview-container.show {
@@ -253,7 +258,6 @@
             max-height: 100%;
             object-fit: contain;
             border-radius: 8px;
-            flex: 1;
         }
         
         /* Buttons */
