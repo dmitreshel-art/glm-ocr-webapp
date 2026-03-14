@@ -2,10 +2,11 @@
 # Change MODEL_VARIANT to switch between quantizations
 
 model:
-  # Variant: Q8_0 (default) or F16
+  # Variant: Q8_0 (default) or f16
+  # Note: use lowercase "f16", not "F16"
   # Q8_0: ~950 MB, 95-98% accuracy
-  # F16: ~1.9 GB, 98-99% accuracy (better for handwriting, low quality)
-  variant: F16
+  # f16: ~1.9 GB, 98-99% accuracy (better for handwriting, low quality)
+  variant: f16
   
   # Context size (tokens)
   ctx_size: 16384
