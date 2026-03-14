@@ -5,6 +5,7 @@ FastAPI backend for OCR processing using llama.cpp server.
 
 import asyncio
 import base64
+import io
 import os
 from pathlib import Path
 
@@ -13,6 +14,7 @@ import httpx
 from fastapi import FastAPI, File, HTTPException, UploadFile
 from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
+from PIL import Image
 
 app = FastAPI(title="GLM-OCR Web", version="1.0.0")
 
@@ -21,6 +23,37 @@ LLAMA_SERVER_URL = os.getenv("LLAMA_SERVER_URL", "http://llama-server:8080")
 UPLOAD_DIR = Path(os.getenv("UPLOAD_DIR", "/tmp/ocr-uploads"))
 
 UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
+
+# Max image dimensions for GLM-OCR (to fit in context)
+MAX_IMAGE_WIDTH = 1280
+MAX_IMAGE_HEIGHT = 1280
+MAX_TOKENS_ESTIMATE = 3000  # Safe limit for ctx-size=4096
+
+
+def resize_image(image_data: bytes, max_width: int = MAX_IMAGE_WIDTH, max_height: int = MAX_IMAGE_HEIGHT) -> tuple[bytes, str]:
+    """Resize image to fit within max dimensions while preserving aspect ratio."""
+    img = Image.open(io.BytesIO(image_data))
+    
+    # Get original format
+    img_format = img.format or "PNG"
+    mime_type = f"image/{img_format.lower()}"
+    if img_format == "JPG":
+        mime_type = "image/jpeg"
+    
+    # Resize if needed
+    if img.width > max_width or img.height > max_height:
+        img.thumbnail((max_width, max_height), Image.Resampling.LANCZOS)
+    
+    # Convert to RGB if necessary (for PNG with transparency)
+    if img.mode in ("RGBA", "P"):
+        img = img.convert("RGB")
+        img_format = "JPEG"
+        mime_type = "image/jpeg"
+    
+    # Save to bytes
+    output = io.BytesIO()
+    img.save(output, format=img_format, quality=85)
+    return output.getvalue(), mime_type
 
 # Mount static files
 app.mount("/static", StaticFiles(directory=Path(__file__).parent.parent / "static"), name="static")
@@ -57,8 +90,14 @@ async def process_ocr(file: UploadFile = File(...)):
         raise HTTPException(400, f"Invalid file type: {file.content_type}")
     
     content = await file.read()
-    image_base64 = base64.b64encode(content).decode("utf-8")
-    mime_type = file.content_type or "image/png"
+    
+    # Resize image to fit context window
+    try:
+        resized_content, mime_type = resize_image(content)
+    except Exception as e:
+        raise HTTPException(400, f"Failed to process image: {str(e)}")
+    
+    image_base64 = base64.b64encode(resized_content).decode("utf-8")
     image_url = f"data:{mime_type};base64,{image_base64}"
     
     prompt = "Recognize all text in this image. Output only the text without any comments."
