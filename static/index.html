@@ -186,7 +186,7 @@
             background: rgba(37, 99, 235, 0.08);
         }
         
-        .upload-zone.has-preview {
+        .upload-zone.hidden {
             display: none;
         }
         
@@ -222,9 +222,13 @@
             display: none;
             flex: 1;
             min-height: 0;
-            overflow: hidden;
             justify-content: center;
             align-items: center;
+            overflow: hidden;
+        }
+        
+        #preview-container.visible {
+            display: flex;
         }
         
         #preview-image {
@@ -240,6 +244,11 @@
             flex: 1;
             min-height: 0;
             overflow-y: auto;
+        }
+        
+        #pdf-container.visible {
+            display: flex;
+            flex-direction: column;
         }
         
         .pdf-info {
@@ -594,9 +603,9 @@
             const reader = new FileReader();
             reader.onload = e => {
                 previewImage.src = e.target.result;
-                previewContainer.style.display = 'flex';
-                pdfContainer.style.display = 'none';
-                uploadZone.classList.add('has-preview');
+                uploadZone.classList.add('hidden');
+                previewContainer.classList.add('visible');
+                pdfContainer.classList.remove('visible');
                 processBtn.disabled = false;
                 clearBtn.style.display = 'block';
                 hideError();
@@ -635,9 +644,9 @@
                     await page.render({ canvasContext: ctx, viewport }).promise;
                     pagesContainer.appendChild(canvas);
                 }
-                previewContainer.style.display = 'none';
-                pdfContainer.style.display = 'flex';
-                uploadZone.classList.add('has-preview');
+                previewContainer.classList.remove('visible');
+                pdfContainer.classList.add('visible');
+                uploadZone.classList.add('hidden');
                 processBtn.disabled = false;
                 clearBtn.style.display = 'block';
                 hideError();
@@ -652,9 +661,9 @@
         
         clearBtn.addEventListener('click', () => {
             selectedFile = null;
-            previewContainer.style.display = 'none';
-            pdfContainer.style.display = 'none';
-            uploadZone.classList.remove('has-preview');
+            uploadZone.classList.remove('hidden');
+            previewContainer.classList.remove('visible');
+            pdfContainer.classList.remove('visible');
             processBtn.disabled = true;
             clearBtn.style.display = 'none';
             resultText.textContent = 'Загрузите изображение или PDF';
