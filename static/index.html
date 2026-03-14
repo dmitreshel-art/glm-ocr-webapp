@@ -23,32 +23,34 @@
             --text-primary: #1e293b;
             --text-secondary: #64748b;
             --text-muted: #94a3b8;
-            --shadow: 0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06);
+            --shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
         
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
             background: var(--bg-main);
             color: var(--text-primary);
             min-height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
         
         .container {
             max-width: 1400px;
+            width: 100%;
             margin: 0 auto;
-            padding: 1.5rem;
-            min-height: 100vh;
+            padding: 1rem;
             display: flex;
             flex-direction: column;
+            height: 100vh;
         }
         
         header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding-bottom: 1.5rem;
-            border-bottom: 1px solid var(--border);
-            margin-bottom: 1.5rem;
+            padding: 0.5rem 0;
+            margin-bottom: 1rem;
         }
         
         .logo {
@@ -70,31 +72,17 @@
         }
         
         .logo-text {
-            display: flex;
-            flex-direction: column;
-        }
-        
-        .logo-title {
-            font-size: 1.25rem;
+            font-size: 1.5rem;
             font-weight: 700;
             color: var(--text-primary);
-        }
-        
-        .logo-subtitle {
-            font-size: 0.75rem;
-            color: var(--text-muted);
-            font-weight: 400;
         }
         
         .status-indicator {
             display: flex;
             align-items: center;
             gap: 0.5rem;
-            padding: 0.5rem 1rem;
-            background: var(--bg-card);
-            border-radius: 8px;
-            border: 1px solid var(--border);
-            font-size: 0.875rem;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
         }
         
         .status-dot {
@@ -106,16 +94,11 @@
         
         .status-dot.ready {
             background: var(--success);
-            box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.2);
+            box-shadow: 0 0 8px var(--success);
         }
         
         .status-dot.error {
             background: var(--error);
-        }
-        
-        .status-text {
-            color: var(--text-secondary);
-            font-weight: 500;
         }
         
         .main-grid {
@@ -132,24 +115,15 @@
             border-radius: 12px;
             display: flex;
             flex-direction: column;
-            box-shadow: var(--shadow);
             overflow: hidden;
         }
         
         .panel-header {
-            padding: 1rem 1.25rem;
+            padding: 0.75rem 1rem;
             border-bottom: 1px solid var(--border);
             font-weight: 600;
-            color: var(--text-primary);
+            color: var(--text-secondary);
             font-size: 0.9rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            flex-shrink: 0;
-        }
-        
-        .panel-header-icon {
-            color: var(--primary);
         }
         
         .panel-content {
@@ -173,7 +147,6 @@
             justify-content: center;
             align-items: center;
             min-height: 200px;
-            background: var(--bg-main);
         }
         
         .upload-zone:hover, .upload-zone.dragover {
@@ -181,7 +154,7 @@
             background: rgba(37, 99, 235, 0.05);
         }
         
-        .upload-zone.hidden {
+        .upload-zone.has-image {
             display: none;
         }
         
@@ -190,22 +163,15 @@
             margin-bottom: 0.5rem;
         }
         
-        .upload-title {
-            font-size: 1rem;
-            font-weight: 600;
-            color: var(--text-primary);
+        .upload-text {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
             margin-bottom: 0.5rem;
         }
         
         .upload-hint {
-            color: var(--text-secondary);
-            font-size: 0.875rem;
-        }
-        
-        .upload-formats {
-            margin-top: 0.5rem;
-            font-size: 0.75rem;
             color: var(--text-muted);
+            font-size: 0.8rem;
         }
         
         #file-input {
@@ -216,13 +182,11 @@
             display: none;
             flex: 1;
             min-height: 0;
-            overflow: hidden;
         }
         
-        #preview-container.visible {
+        #preview-container.show {
             display: flex;
-            align-items: center;
-            justify-content: center;
+            flex-direction: column;
         }
         
         #preview-image {
@@ -230,6 +194,7 @@
             max-height: 100%;
             object-fit: contain;
             border-radius: 8px;
+            flex: 1;
         }
         
         #pdf-container {
@@ -239,88 +204,54 @@
             overflow-y: auto;
         }
         
-        #pdf-container.visible {
+        #pdf-container.show {
             display: flex;
             flex-direction: column;
         }
         
         .pdf-info {
-            padding: 0.5rem 0.75rem;
-            background: var(--bg-main);
-            border-radius: 6px;
-            font-size: 0.875rem;
-            color: var(--text-secondary);
-            margin-bottom: 0.5rem;
-        }
-        
-        .pdf-pages {
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-        }
-        
-        .pdf-page {
-            width: 100%;
-            border-radius: 6px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-        }
-        
-        .pdf-info {
-            padding: 0.75rem 1rem;
-            background: var(--bg-main);
+            padding: 8px 12px;
+            background: rgba(0,0,0,0.05);
             border-radius: 8px;
-            margin-bottom: 0.75rem;
-            font-size: 0.875rem;
+            font-size: 14px;
             color: var(--text-secondary);
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-        
-        .pdf-info-icon {
-            color: var(--primary);
+            margin-bottom: 8px;
         }
         
         .pdf-pages {
             display: flex;
             flex-direction: column;
-            gap: 0.5rem;
+            gap: 8px;
         }
         
         .pdf-page {
             width: 100%;
             border-radius: 8px;
             box-shadow: var(--shadow);
-            background: white;
         }
         
         .btn-row {
-            flex-shrink: 0;
             display: flex;
-            gap: 0.75rem;
-            margin-top: 1rem;
+            gap: 0.5rem;
+            margin-top: 0.75rem;
         }
         
         .btn {
             background: var(--primary);
             color: white;
             border: none;
-            padding: 0.75rem 1.5rem;
-            border-radius: 8px;
-            font-size: 0.875rem;
+            padding: 0.6rem 1.5rem;
+            border-radius: 6px;
+            font-size: 0.9rem;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.2s ease;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            justify-content: center;
+            transition: all 0.3s ease;
             flex: 1;
         }
         
-        .btn:hover:not(:disabled) {
-            background: var(--primary-hover);
+        .btn:hover {
             transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
         }
         
         .btn:disabled {
@@ -330,39 +261,29 @@
         }
         
         .btn-secondary {
-            background: var(--bg-main);
-            color: var(--text-primary);
+            background: transparent;
             border: 1px solid var(--border);
+            color: var(--text-secondary);
         }
         
-        .btn-secondary:hover:not(:disabled) {
-            background: var(--bg-hover);
-            border-color: var(--text-secondary);
-        }
-        
-        .btn-success {
-            background: #059669;
-            border-color: #059669;
-        }
-        
-        .btn-success:hover:not(:disabled) {
-            background: #047857;
+        .btn-secondary:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            background: transparent;
         }
         
         #result-text {
-            background: var(--bg-main);
-            border: 1px solid var(--border);
+            background: var(--bg-hover);
             border-radius: 8px;
             padding: 1rem;
-            font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
-            font-size: 0.875rem;
-            line-height: 1.6;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 0.9rem;
+            line-height: 1.5;
             white-space: pre-wrap;
             word-wrap: break-word;
             flex: 1;
             overflow-y: auto;
             color: var(--text-primary);
-            min-height: 0;
         }
         
         #result-text::-webkit-scrollbar {
@@ -379,9 +300,8 @@
         }
         
         .progress {
-            flex-shrink: 0;
             display: none;
-            margin-top: 1rem;
+            margin-top: 0.75rem;
         }
         
         .progress.show {
@@ -389,15 +309,15 @@
         }
         
         .progress-bar {
-            height: 4px;
-            background: var(--bg-main);
+            height: 3px;
+            background: var(--bg-hover);
             border-radius: 2px;
             overflow: hidden;
         }
         
         .progress-fill {
             height: 100%;
-            background: linear-gradient(90deg, var(--primary), #4f46e5);
+            background: linear-gradient(90deg, var(--primary), var(--success));
             width: 0%;
             animation: progress 2s ease-in-out infinite;
         }
@@ -409,55 +329,35 @@
         }
         
         .error-box {
-            flex-shrink: 0;
-            background: rgba(220, 38, 38, 0.08);
-            border: 1px solid rgba(220, 38, 38, 0.3);
-            border-radius: 8px;
-            padding: 0.75rem 1rem;
+            background: rgba(220, 38, 38, 0.1);
+            border: 1px solid var(--error);
+            border-radius: 6px;
+            padding: 0.75rem;
             color: var(--error);
-            font-size: 0.875rem;
+            font-size: 0.9rem;
             display: none;
-            margin-top: 1rem;
+            margin-top: 0.75rem;
         }
         
         .error-box.show {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-        
-        .error-icon {
-            font-size: 1rem;
+            display: block;
         }
         
         footer {
-            padding: 1rem;
             text-align: center;
+            padding: 0.5rem;
             color: var(--text-muted);
             font-size: 0.75rem;
-            margin-top: 1.5rem;
-            flex-shrink: 0;
         }
         
         footer a {
             color: var(--primary);
             text-decoration: none;
-            font-weight: 500;
-        }
-        
-        footer a:hover {
-            text-decoration: underline;
         }
         
         @media (max-width: 900px) {
             .main-grid {
                 grid-template-columns: 1fr;
-            }
-        }
-        
-        @media (min-width: 1600px) {
-            .container {
-                max-width: 1600px;
             }
         }
     </style>
@@ -467,77 +367,53 @@
         <header>
             <div class="logo">
                 <div class="logo-icon">📄</div>
-                <div class="logo-text">
-                    <div class="logo-title">DocReader</div>
-                    <div class="logo-subtitle">Распознавание документов</div>
-                </div>
+                <span class="logo-text">DocReader</span>
             </div>
             <div class="status-indicator">
                 <span class="status-dot" id="status-dot"></span>
-                <span class="status-text" id="status-text">Проверка...</span>
+                <span id="status-text">Проверка сервера...</span>
             </div>
         </header>
         
         <div class="main-grid">
             <div class="panel">
-                <div class="panel-header">
-                    <span class="panel-header-icon">📎</span>
-                    Документ
-                </div>
+                <div class="panel-header">📷 Изображение</div>
                 <div class="panel-content">
                     <div class="upload-zone" id="upload-zone">
                         <div class="upload-icon">📄</div>
-                        <div class="upload-title">Перетащите или выберите файл</div>
-                        <div class="upload-hint">Изображение или PDF-документ</div>
-                        <div class="upload-formats">PNG, JPG, WebP, GIF, PDF • до 50 МБ</div>
+                        <div class="upload-text">Перетащите или нажмите для выбора</div>
+                        <div class="upload-hint">PNG, JPG, WebP, GIF, PDF • до 50MB</div>
                         <input type="file" id="file-input" accept="image/*,.pdf,application/pdf">
                     </div>
                     <div id="preview-container">
                         <img id="preview-image" alt="Предпросмотр">
                     </div>
                     <div id="pdf-container">
-                        <div class="pdf-info">
-                            <span class="pdf-info-icon">📄</span>
-                            <span id="pdf-filename"></span>
-                        </div>
+                        <div class="pdf-info" id="pdf-info"></div>
                         <div class="pdf-pages" id="pdf-pages"></div>
                     </div>
                     <div class="btn-row">
-                        <button class="btn" id="process-btn" disabled>
-                            <span>🔍</span> Распознать
-                        </button>
-                        <button class="btn btn-secondary" id="clear-btn" style="display:none">
-                            <span>✕</span> Очистить
-                        </button>
+                        <button class="btn" id="process-btn" disabled>🔍 Распознать</button>
+                        <button class="btn btn-secondary" id="clear-btn" style="display:none">✕ Очистить</button>
                     </div>
                     <div class="progress" id="progress">
                         <div class="progress-bar">
                             <div class="progress-fill"></div>
                         </div>
                     </div>
-                    <div class="error-box" id="error-box">
-                        <span class="error-icon">⚠️</span>
-                        <span id="error-text"></span>
-                    </div>
+                    <div class="error-box" id="error-box"></div>
                 </div>
             </div>
             
             <div class="panel">
-                <div class="panel-header">
-                    <span class="panel-header-icon">📝</span>
-                    Результат
-                </div>
+                <div class="panel-header">📝 Результат</div>
                 <div class="panel-content">
-                    <div id="result-text" style="color: var(--text-muted); font-style: italic;">
-                        Загрузите документ для распознавания текста
+                    <div id="result-text" style="color: var(--text-secondary); font-style: italic;">
+                        Загрузите изображение для распознавания текста
                     </div>
                     <div class="btn-row">
-                        <button class="btn btn-secondary" id="copy-btn" disabled>
-                            <span>📋</span> Копировать
-                        </button>
-                        <button class="btn btn-success btn-secondary" id="download-btn" disabled>
-                            <span>💾</span> Скачать TXT
-                        </button>
+                        <button class="btn btn-secondary" id="copy-btn" disabled>📋 Копировать</button>
+                        <button class="btn btn-secondary" id="download-btn" disabled>💾 Скачать TXT</button>
                     </div>
                 </div>
             </div>
@@ -571,7 +447,6 @@
                 const res = await fetch('/api/health', { signal: AbortSignal.timeout(5000) });
                 if (res.ok) {
                     statusDot.classList.add('ready');
-                    statusDot.classList.remove('error');
                     statusText.textContent = 'Сервер готов';
                     return;
                 }
@@ -610,16 +485,18 @@
                 return;
             }
             selectedFile = file;
+            
             if (file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf')) {
                 renderPdfPreview(file);
                 return;
             }
+            
             const reader = new FileReader();
             reader.onload = e => {
                 previewImage.src = e.target.result;
-                uploadZone.classList.add('hidden');
-                previewContainer.classList.add('visible');
-                pdfContainer.classList.remove('visible');
+                previewContainer.classList.add('show');
+                pdfContainer.classList.remove('show');
+                uploadZone.classList.add('has-image');
                 processBtn.disabled = false;
                 clearBtn.style.display = 'block';
                 hideError();
@@ -644,7 +521,7 @@
                 }
                 const arrayBuffer = await file.arrayBuffer();
                 const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
-                document.getElementById('pdf-filename').textContent = file.name + ' — ' + pdf.numPages + ' стр.';
+                document.getElementById('pdf-info').textContent = file.name + ' — ' + pdf.numPages + ' стр.';
                 const pagesContainer = document.getElementById('pdf-pages');
                 pagesContainer.innerHTML = '';
                 for (let i = 1; i <= pdf.numPages; i++) {
@@ -658,9 +535,9 @@
                     await page.render({ canvasContext: ctx, viewport }).promise;
                     pagesContainer.appendChild(canvas);
                 }
-                previewContainer.classList.remove('visible');
-                pdfContainer.classList.add('visible');
-                uploadZone.classList.add('hidden');
+                previewContainer.classList.remove('show');
+                pdfContainer.classList.add('show');
+                uploadZone.classList.add('has-image');
                 processBtn.disabled = false;
                 clearBtn.style.display = 'block';
                 hideError();
@@ -675,9 +552,9 @@
         
         clearBtn.addEventListener('click', () => {
             selectedFile = null;
-            uploadZone.classList.remove('hidden');
-            previewContainer.classList.remove('visible');
-            pdfContainer.classList.remove('visible');
+            previewContainer.classList.remove('show');
+            pdfContainer.classList.remove('show');
+            uploadZone.classList.remove('has-image');
             processBtn.disabled = true;
             clearBtn.style.display = 'none';
             resultText.textContent = 'Загрузите изображение или PDF';
@@ -727,20 +604,20 @@
             a.download = filename;
             a.click();
             URL.revokeObjectURL(url);
-            downloadBtn.innerHTML = '<span>✓</span> Скачано';
-            setTimeout(() => downloadBtn.innerHTML = '<span>💾</span> Скачать TXT', 1500);
+            downloadBtn.textContent = '✓ Скачано';
+            setTimeout(() => downloadBtn.textContent = '💾 Скачать TXT', 1500);
         });
         
         copyBtn.addEventListener('click', () => {
             navigator.clipboard.writeText(resultText.textContent).then(() => {
-                copyBtn.innerHTML = '<span>✓</span> Скопировано';
-                setTimeout(() => copyBtn.innerHTML = '<span>📋</span> Копировать', 1500);
+                copyBtn.textContent = '✓ Скопировано';
+                setTimeout(() => copyBtn.textContent = '📋 Копировать', 1500);
             });
         });
         
         function showError(msg) {
+            errorBox.textContent = msg;
             errorBox.classList.add('show');
-            errorBox.querySelector('#error-text').textContent = msg;
         }
         function hideError() {
             errorBox.classList.remove('show');
